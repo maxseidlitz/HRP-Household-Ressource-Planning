@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, isNull, max } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull, max, ne } from "drizzle-orm";
 import type { DB } from "@/db/client";
 import {
   commitment,
@@ -127,7 +127,8 @@ export function listTaskViews(
             completion.taskId,
             rows.map((r) => r.task.id),
           ),
-          eq(completion.status, "valid"),
+          // Angefochtene zählen weiter als erledigt, bis entschieden ist.
+          ne(completion.status, "revoked"),
         ),
       )
       .groupBy(completion.taskId)

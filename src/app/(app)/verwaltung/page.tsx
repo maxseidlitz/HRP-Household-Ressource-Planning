@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireAdmin } from "@/server/context";
+import { listFeedback } from "@/server/queries/feedback";
 import { listMembers } from "@/server/queries/households";
 import { listRooms } from "@/server/queries/rooms";
 import { listTaskViews } from "@/server/queries/tasks";
@@ -15,6 +16,10 @@ export default async function AdminPage() {
     viewerId: ctx.user.id,
     now: new Date(),
   }).filter((t) => !t.isPrivate);
+
+  const newTickets = listFeedback(ctx.db, {
+    householdId: ctx.household.id,
+  }).filter((t) => t.ticket.status === "new").length;
 
   const steps = [
     {
@@ -43,6 +48,27 @@ export default async function AdminPage() {
       icon: "👥",
       title: "Mitglieder",
       text: "Rollen, Passwort-Reset, entfernen",
+      done: true,
+    },
+    {
+      href: "/verwaltung/statistik",
+      icon: "📊",
+      title: "Statistik",
+      text: "Aktivität, Screens, Aufgaben-Kennzahlen",
+      done: true,
+    },
+    {
+      href: "/verwaltung/feedback",
+      icon: "💬",
+      title: "Feedback",
+      text: newTickets ? `${newTickets} neu` : "Keine neuen Tickets",
+      done: newTickets === 0,
+    },
+    {
+      href: "/verwaltung/einstellungen",
+      icon: "⚙️",
+      title: "Einstellungen",
+      text: "Schwellen, Widerspruch, Export",
       done: true,
     },
     {

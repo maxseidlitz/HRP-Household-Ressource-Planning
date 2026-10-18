@@ -5,6 +5,7 @@ import { household, invite, membership, user } from "@/db/schema";
 import { assert, DomainError } from "../errors";
 import { getMembership } from "./households";
 import { notifyHousehold } from "./notifications";
+import { requestFeatureVoteIfReady } from "./settings";
 
 export function newToken(): string {
   return randomBytes(24).toString("base64url");
@@ -149,6 +150,7 @@ export function acceptInvite(
         payload: { userName: joined?.name ?? "Jemand" },
         dedupePrefix: `joined:${i.householdId}:${input.userId}`,
       });
+      requestFeatureVoteIfReady(tx as unknown as DB, i.householdId);
     }
     tx.update(user)
       .set({ lastHouseholdId: i.householdId })

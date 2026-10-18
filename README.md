@@ -33,7 +33,7 @@ npm run dev
 ```
 
 Alle Daten liegen in einem Ordner (auf ZimaOS `/DATA/AppData/hrp`): SQLite-Datei,
-Auth-Schlüssel und später Uploads und Backups. Diesen Ordner sichern, mehr
+Auth-Schlüssel, Feedback-Screenshots und Backups. Diesen Ordner sichern, mehr
 braucht es nicht.
 
 ## 📱 So sieht's aus
@@ -54,11 +54,15 @@ braucht es nicht.
 | :-----------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------: |
 | <img src="docs/screenshots/13-einplanen.png" width="240" alt="Aufgabe einplanen mit Schnellwahl und .ics-Download"> | <img src="docs/screenshots/14-mitteilungen.png" width="240" alt="Mitteilungszentrale mit ungelesenen Meldungen"> | <img src="docs/screenshots/15-urlaub.png" width="240" alt="Geplanter Urlaub mit abhakbarem Urlaubspaket"> |
 
+|                                               Widerspruch & Abstimmung                                                |                                                 Admin-Statistik                                                  |                                           Feedback-Tickets                                            |
+| :-------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/16-widerspruch.png" width="240" alt="Abstimmung über einen Widerspruch mit Zwischenstand"> | <img src="docs/screenshots/17-statistik.png" width="240" alt="Statistik-Dashboard mit aktiven Personen pro Tag"> | <img src="docs/screenshots/18-feedback.png" width="240" alt="Feedback-Ticket mit Status und Antwort"> |
+
 |                                           Raum einrichten                                            |                              Profil & Avatar                               |                                  WG erstellen                                   |
 | :--------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
 | <img src="docs/screenshots/03-raum.png" width="240" alt="Objekt mit Aufgabenvorschlägen hinzufügen"> | <img src="docs/screenshots/08-profil.png" width="240" alt="Avatar-Editor"> | <img src="docs/screenshots/02-wg-erstellen.png" width="240" alt="WG erstellen"> |
 
-> Stand: Phase 3. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
+> Stand: Phase 4. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
 > (`npm run screenshots`).
 
 ## ✨ Funktionen
@@ -73,7 +77,7 @@ braucht es nicht.
 | 🗺️  | Wohnungsplan mit Statusfarben, Raum-Editor auf dem Raster (L-Formen, Türen, Möbel, Einbauküche, Unterräume)                                        | ✅ Phase 1b |
 | 🎮  | Isometrisches Diorama (PixiJS): Voxel-Möbel in Statusfarben, Fliegen & Gerüche, Avatare mit Wegfindung, Putz-Animation, Drehen/Zoomen, 2D-Fallback | ✅ Phase 2  |
 | ⏰  | Einplanen mit Wecker-Icon, Kalender-Export (.ics mit Erinnerung), Mitteilungen mit Badge, Urlaub mit Urlaubspaket und Koffer-Avatar                | ✅ Phase 3  |
-| 📊  | Admin-Statistiken, Feedback-Tickets, Widerspruch per Abstimmung                                                                                    | Phase 4     |
+| 📊  | Admin-Statistiken, Feedback-Tickets mit Screenshot, Einstellungen, JSON-Export, Widerspruch per Abstimmung                                         | ✅ Phase 4  |
 | 🔔  | HTTPS, PWA-Installation, Push-Benachrichtigungen                                                                                                   | Phase 5     |
 
 Details: [Spezifikation](docs/SPEC.md) · [Umsetzungsplan](docs/PLAN.md)

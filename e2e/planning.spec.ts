@@ -15,7 +15,8 @@ test("Einplanen mit .ics, Mitteilungen und Urlaubspaket", async ({
   const page = await max.newPage();
   await page.goto("/registrieren");
   await register(page, { name: "Max", username: uniq("max") });
-  await createHousehold(page, "WG Planung", 2);
+  // 3 erwartete Mitglieder: noch keine Abstimmung zur Widerspruchsfunktion
+  await createHousehold(page, "WG Planung", 3);
   await createRoom(page, { type: "Küche", name: "Küche" });
   await addObject(page, "trash_rest");
 

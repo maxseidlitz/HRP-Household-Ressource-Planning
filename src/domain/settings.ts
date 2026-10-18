@@ -9,6 +9,8 @@ export const householdSettingsSchema = z.object({
   /** Darunter gibt es 0 Punkte. */
   minProgress: z.number().min(0).max(1).default(0.15),
   objectionsEnabled: z.boolean().default(false),
+  /** Wie die Widerspruchsfunktion eingeschaltet wurde (Spez. 6.3). */
+  objectionsEnabledBy: z.enum(["vote", "admin"]).nullable().default(null),
   icsAlarmMinutes: z.number().int().min(0).default(120),
 });
 
