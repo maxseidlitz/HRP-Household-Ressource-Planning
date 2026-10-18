@@ -7,6 +7,7 @@ describe("parseEnv", () => {
       DATA_DIR: "./data",
       ALLOWED_HOSTS: ["*"],
       APP_PROTOCOL: "http",
+      AUTH_RATE_LIMIT: "on",
     });
   });
 

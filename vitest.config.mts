@@ -4,9 +4,9 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
+      "@": path.resolve(import.meta.dirname, "src"),
       // "server-only" wirft außerhalb von React Server Components.
-      "server-only": path.resolve(__dirname, "src/test/empty.ts"),
+      "server-only": path.resolve(import.meta.dirname, "src/test/empty.ts"),
     },
   },
   test: {

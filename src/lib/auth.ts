@@ -40,6 +40,7 @@ function createAuth() {
         lastHouseholdId: { type: "string", required: false, input: false },
       },
     },
+    rateLimit: { enabled: env.AUTH_RATE_LIMIT === "on" },
     session: {
       expiresIn: 60 * 60 * 24 * 90, // 90 Tage: WG-App bleibt auf dem Handy eingeloggt
       updateAge: 60 * 60 * 24,
