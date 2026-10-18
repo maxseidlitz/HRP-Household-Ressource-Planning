@@ -24,7 +24,7 @@ export default async function SetupPage({ searchParams }: PageProps<"/setup">) {
           <CreateHouseholdForm />
         </Card>
         {households.length === 0 ? (
-          <p className="rounded-xl border-2 border-dashed border-ink/40 p-4 text-center text-sm">
+          <p className="rounded-xl border border-dashed border-black/15 p-4 text-center text-sm">
             <strong>Du wurdest eingeladen?</strong>
             <br />
             Öffne einfach den Einladungslink oder scanne den QR-Code. Du landest

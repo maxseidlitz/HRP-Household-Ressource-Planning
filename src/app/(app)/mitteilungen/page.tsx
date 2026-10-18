@@ -27,7 +27,7 @@ export default async function NotificationsPage() {
       <MarkRead unread={unread} />
       <h1 className="text-2xl font-bold">Mitteilungen</h1>
       {items.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-ink/40 p-6 text-center">
+        <div className="rounded-2xl border border-dashed border-black/15 p-6 text-center">
           <p className="mb-2 text-4xl">🔕</p>
           <p className="font-semibold">Noch keine Mitteilungen.</p>
           <p className="text-sm text-ink/70">
@@ -60,7 +60,7 @@ export default async function NotificationsPage() {
                 )}
               </>
             );
-            const cls = `flex items-center gap-3 rounded-2xl border-2 px-3 py-2.5 ${n.readAt ? "border-ink/20 bg-white/40" : "border-ink bg-white/80 font-medium"}`;
+            const cls = `flex items-center gap-3 rounded-2xl border px-3 py-2.5 ${n.readAt ? "border-black/5 bg-white/40" : "border-white/80 bg-white/80 font-medium shadow-glass"}`;
             return (
               <li key={n.id}>
                 {v.href ? (

@@ -20,10 +20,10 @@ export function VoteForm({
   const options = [
     {
       vote: "confirm",
-      label: "👍 Ist erledigt",
+      label: "Ist erledigt",
       hint: `${completerName} hat’s gemacht`,
     },
-    { vote: "reject", label: "👎 Nicht erledigt", hint: "Punkte zurücknehmen" },
+    { vote: "reject", label: "Nicht erledigt", hint: "Punkte zurücknehmen" },
   ] as const;
   return (
     <form action={action} className="flex flex-col gap-2">
@@ -36,7 +36,7 @@ export function VoteForm({
             value={o.vote}
             disabled={pending}
             aria-pressed={myVote === o.vote}
-            className={`flex flex-col items-center gap-0.5 rounded-xl border-2 border-b-4 border-ink px-3 py-3 font-bold ${myVote === o.vote ? "bg-ink text-cream" : "bg-white"}`}
+            className={`flex flex-col items-center gap-0.5 rounded-2xl glass px-3 py-3 font-semibold ${myVote === o.vote ? "bg-ink text-white" : "bg-white"}`}
           >
             {o.label}
             <span className="text-xs font-normal opacity-70">{o.hint}</span>

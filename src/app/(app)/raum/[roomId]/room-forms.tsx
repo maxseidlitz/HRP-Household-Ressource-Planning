@@ -65,7 +65,7 @@ export function AddObjectForm({
           name="type"
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="rounded-lg border-2 border-ink/30 bg-white px-3 py-2 text-base font-normal"
+          className="rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-base font-normal outline-none focus:border-sage focus:ring-4 focus:ring-sage/15"
         >
           {library.map((o) => (
             <option key={o.type} value={o.type}>
@@ -138,7 +138,7 @@ export function SubroomForm({ parentRoomId }: { parentRoomId: string }) {
           <select
             name="type"
             defaultValue="bath"
-            className="rounded-lg border-2 border-ink/30 bg-white px-2 py-2 text-base font-normal"
+            className="rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-base font-normal outline-none focus:border-sage focus:ring-4 focus:ring-sage/15"
           >
             {(["bath", "wc", "kitchen", "storage", "other"] as const).map(
               (t) => (

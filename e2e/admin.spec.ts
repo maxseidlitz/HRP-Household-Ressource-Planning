@@ -64,7 +64,7 @@ test("Widerspruch per Abstimmung, Feedback mit Screenshot, Einstellungen, Statis
   await ben.goto("/aufgaben");
   await ben.getByRole("link", { name: /Klo putzen/ }).click();
   await ben.getByLabel("Optionen für die Erledigung von Anna").click();
-  await ben.getByRole("button", { name: "✋ Nicht erledigt" }).click();
+  await ben.getByRole("button", { name: "Nicht erledigt" }).click();
   await expect(ben).toHaveURL(/\/widerspruch\//);
   await expect(ben.getByTestId("tally")).toContainText("1👎 nicht erledigt");
 
@@ -86,9 +86,9 @@ test("Widerspruch per Abstimmung, Feedback mit Screenshot, Einstellungen, Statis
   // --- Feedback mit Screenshot aus dem Profilmenü ---
   await anna.goto("/rangliste");
   await anna.getByLabel("Profilmenü").click();
-  await anna.getByRole("link", { name: "💬 Feedback senden" }).click();
+  await anna.getByRole("link", { name: "Feedback senden" }).click();
   await expect(anna).toHaveURL(/von=%2Frangliste/);
-  await anna.locator("label", { hasText: "💡 Idee" }).click();
+  await anna.locator("label", { hasText: "Idee" }).click();
   await anna.getByLabel("Beschreibung").fill("Bitte einen Dark Mode!");
   await anna.getByLabel(/Screenshot/).setInputFiles({
     name: "bild.png",

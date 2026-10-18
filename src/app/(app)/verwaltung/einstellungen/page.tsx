@@ -62,10 +62,10 @@ export default async function SettingsPage() {
         <h2 className="font-bold">Daten</h2>
         <a
           href="/api/export"
-          className="rounded-xl border-2 border-b-4 border-ink bg-white px-3 py-2 text-center font-semibold"
+          className="rounded-full glass px-3 py-2 text-center font-semibold"
           download
         >
-          ⬇️ Export als JSON
+          Export als JSON
         </a>
         <p className="text-xs text-ink/60">
           Ohne private Zimmer. Zusätzlich legt die App täglich ein Backup der
@@ -78,13 +78,13 @@ export default async function SettingsPage() {
         className="flex flex-col gap-2 text-sm"
       >
         <Link href="/verwaltung/urlaubspaket" className="underline">
-          🧳 Urlaubspaket: verknüpfte Aufgaben
+          Urlaubspaket: verknüpfte Aufgaben
         </Link>
         <Link href="/verwaltung/einladungen" className="underline">
-          ✉️ Einladungen verwalten
+          Einladungen verwalten
         </Link>
         <Link href="/verwaltung/mitglieder" className="underline">
-          👥 Mitglieder, Admin-Rechte, Passwort-Reset
+          Mitglieder, Admin-Rechte, Passwort-Reset
         </Link>
       </nav>
     </div>

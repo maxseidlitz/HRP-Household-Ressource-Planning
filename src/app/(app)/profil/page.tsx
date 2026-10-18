@@ -45,7 +45,7 @@ export default async function ProfilePage() {
               <li key={r.id}>
                 <Link
                   href={`/raum/${r.id}`}
-                  className="flex items-center gap-3 rounded-xl border-2 border-ink bg-white/70 p-3"
+                  className="flex items-center gap-3 rounded-xl glass p-3"
                 >
                   <span aria-hidden className="text-2xl">
                     {ROOM_TYPE_EMOJI[r.type]}
@@ -71,7 +71,7 @@ export default async function ProfilePage() {
           . Wechseln kannst du über dein Profilbild oben rechts.
         </p>
         <Link href="/setup?neu=1" className="text-sm font-semibold underline">
-          ➕ Weitere WG erstellen
+          Weitere WG erstellen
         </Link>
         {!ctx.isCreator && (
           <LeaveHouseholdForm
@@ -81,7 +81,7 @@ export default async function ProfilePage() {
         )}
       </section>
 
-      <LogoutButton className="self-start rounded-xl border-2 border-ink border-b-4 bg-cream px-4 py-2 font-semibold" />
+      <LogoutButton className="self-start rounded-full glass px-4 py-2 font-semibold" />
     </div>
   );
 }

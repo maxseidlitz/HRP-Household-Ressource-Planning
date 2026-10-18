@@ -6,9 +6,9 @@ import { getMembership } from "./households";
 import { notify } from "./notifications";
 
 export const FEEDBACK_CATEGORIES = {
-  bug: "🐞 Bug",
-  idea: "💡 Idee",
-  other: "💬 Sonstiges",
+  bug: "Bug",
+  idea: "Idee",
+  other: "Sonstiges",
 } as const;
 export type FeedbackCategory = keyof typeof FEEDBACK_CATEGORIES;
 

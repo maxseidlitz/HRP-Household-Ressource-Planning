@@ -52,14 +52,14 @@ export default async function TasksPage({
   return (
     <div className="flex flex-col gap-4">
       {willkommen && (
-        <p className="rounded-xl border-2 border-ink bg-status-sweet/40 p-3 text-sm font-medium">
+        <p className="glass rounded-2xl p-3.5 text-sm font-medium">
           Willkommen in {ctx.household.name}! 🎉
         </p>
       )}
       {soonBundle && (
         <Link
           href="/urlaub"
-          className="flex items-center gap-3 rounded-xl border-2 border-ink bg-status-sweet/40 p-3 text-sm font-medium"
+          className="flex items-center gap-3 glass rounded-2xl p-3.5 text-sm font-medium"
           data-testid="vacation-banner"
         >
           <span aria-hidden className="text-2xl">
@@ -108,7 +108,7 @@ export default async function TasksPage({
       )}
 
       {all.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-ink/40 p-6 text-center">
+        <div className="rounded-2xl border border-dashed border-black/15 p-6 text-center">
           <p className="mb-3 font-semibold">Noch keine Aufgaben.</p>
           {ctx.isAdmin ? (
             <Link
@@ -155,7 +155,7 @@ function FilterChip({
     <Link
       href={href}
       aria-current={active ? "true" : undefined}
-      className={`block whitespace-nowrap rounded-full border-2 border-ink px-3 py-1 text-sm font-semibold ${active ? "bg-ink text-cream" : "bg-white/70"}`}
+      className={`block whitespace-nowrap rounded-full border border-black/5 px-3.5 py-1.5 text-sm font-medium shadow-[0_1px_2px_rgb(0_0_0/0.04)] ${active ? "bg-ink text-white" : "bg-white/70"}`}
     >
       {children}
     </Link>

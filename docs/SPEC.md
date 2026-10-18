@@ -493,8 +493,8 @@ lesbar: **Was ist dreckig, was ist als Nächstes dran?**
   drei Schattierungsstufen, dünne dunkle Kontur.
 - Böden je Raumtyp: Fliesen (Bad/Küche), Holzdielen (Zimmer/Wohnzimmer),
   Laminat (Flur).
-- Grundpalette warm und gedeckt (Creme, Holzbraun, Salbeigrün, gedämpftes Blau),
-  damit die **Statusfarben** klar herausstechen.
+- Grundpalette hell und kühl (Weiß, helles Grau, sanfter Farbverlauf im
+  Hintergrund, Akzent Blau), damit die **Statusfarben** klar herausstechen.
 - Weiche Umgebungsschatten, leichter Tageslicht-Look; optional Tag/Nacht.
 
 ### 12.4 Objekte & Status
@@ -534,8 +534,12 @@ lesbar: **Was ist dreckig, was ist als Nächstes dran?**
   Admin.
 - Tipp auf ein Objekt → Bottom-Sheet: Statusbalken mit markiertem Sweet Spot,
   „Erledigt“, „Einplanen“, Historie.
-- Runde Sans-Serif für UI; Pixel-Font nur für Punkte-Popups und Überschriften.
-- Buttons mit leichtem 3D-Kanten-Look.
+- **Liquid Glass** (an iOS 26 angelehnt, modern statt verspielt):
+  durchscheinende, unscharfe Glasflächen mit feiner Lichtkante für Kopfzeile,
+  Karten, Sheets und Menüs; schwebende Tab-Leiste als Glaskapsel mit
+  Linien-Icons; Kapsel-Buttons; Segment-Umschalter mit weißem Schieber.
+- Systemschrift (SF Pro / Inter), keine Emojis in Buttons und Navigation.
+  Objekt-Emojis bleiben als Inhalt (Toilette, Herd …).
 
 ### 12.7 Zu gestaltende Screens
 

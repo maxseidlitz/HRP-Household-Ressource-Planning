@@ -71,25 +71,25 @@ export type IsoCallbacks = {
   onSelect: (objectId: string) => void;
 };
 
-const INK = 0x2f2a24;
-const WALL = 0xefe6d6;
+const INK = 0x3a3a3c;
+const WALL = 0xf7f7f9;
 const WALL_H = 0.55;
-const FOREIGN_FLOOR = 0xcfc8bb;
+const FOREIGN_FLOOR = 0xd6d6dc;
 
 /** Böden je Raumtyp (Spez. 12.3). */
 const FLOOR: Record<
   RoomType,
   { color: number; pattern: "tiles" | "planks" | "plain" }
 > = {
-  kitchen: { color: 0xece6d8, pattern: "tiles" },
-  bath: { color: 0xdfe8ea, pattern: "tiles" },
-  wc: { color: 0xdfe8ea, pattern: "tiles" },
-  hallway: { color: 0xeadcc0, pattern: "planks" },
-  living: { color: 0xdcc29a, pattern: "planks" },
-  bedroom: { color: 0xdcc29a, pattern: "planks" },
-  balcony: { color: 0xd7e2cc, pattern: "plain" },
-  storage: { color: 0xe3dccd, pattern: "plain" },
-  other: { color: 0xebe3d2, pattern: "plain" },
+  kitchen: { color: 0xeceef2, pattern: "tiles" },
+  bath: { color: 0xe2edf3, pattern: "tiles" },
+  wc: { color: 0xe2edf3, pattern: "tiles" },
+  hallway: { color: 0xeee8df, pattern: "planks" },
+  living: { color: 0xe6dac8, pattern: "planks" },
+  bedroom: { color: 0xe6dac8, pattern: "planks" },
+  balcony: { color: 0xe2ede0, pattern: "plain" },
+  storage: { color: 0xe9e9ed, pattern: "plain" },
+  other: { color: 0xedece9, pattern: "plain" },
 };
 
 type Pt = { x: number; y: number };
@@ -179,7 +179,7 @@ export class IsoScene {
     try {
       await app.init({
         resizeTo: container,
-        background: 0xf3ead9,
+        backgroundAlpha: 0,
         antialias: true,
         autoDensity: true,
         resolution: Math.min(window.devicePixelRatio || 1, 2),

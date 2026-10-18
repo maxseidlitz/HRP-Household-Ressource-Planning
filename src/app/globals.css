@@ -1,19 +1,28 @@
 @import "tailwindcss";
 
-/* Warme, gedeckte Grundpalette (Spez. 12.3), damit Statusfarben herausstechen. */
+/*
+ * Liquid Glass: helle, durchscheinende Flächen über einem weichen
+ * Farbverlauf. Die Statusfarben bleiben kräftig und sind das einzige Bunte.
+ * Die alten Token-Namen bleiben, damit Komponenten nicht alle umbenannt
+ * werden müssen: „cream“ ist jetzt Weiß, „sage“ der Akzent (Blau).
+ */
 :root {
-  --cream: #f6efe2;
-  --cream-dark: #eadfca;
-  --wood: #8a6a4b;
-  --wood-dark: #5c4430;
-  --sage: #8fa98a;
-  --sage-dark: #5f7a5a;
-  --dusty-blue: #7d97ad;
-  --ink: #2f2a24;
-  --status-fresh: #4caf50;
-  --status-sweet: #c6d83a;
-  --status-soon: #f29a2e;
-  --status-overdue: #e04a3c;
+  --cream: #ffffff;
+  --cream-dark: #f2f2f7;
+  --wood: #8e8e93;
+  --wood-dark: #636366;
+  --sage: #0a84ff;
+  --sage-dark: #0064d2;
+  --dusty-blue: #5ac8fa;
+  --ink: #1c1c1e;
+  --status-fresh: #30c158;
+  --status-sweet: #b5d334;
+  --status-soon: #ff9f0a;
+  --status-overdue: #ff3b30;
+  --glass-bg: rgb(255 255 255 / 0.58);
+  --glass-bg-strong: rgb(255 255 255 / 0.76);
+  --glass-edge: rgb(255 255 255 / 0.75);
+  --glass-shadow: 0 1px 1px rgb(0 0 0 / 0.04), 0 8px 28px rgb(30 41 59 / 0.1);
 }
 
 @theme inline {
@@ -30,13 +39,60 @@
   --color-status-soon: var(--status-soon);
   --color-status-overdue: var(--status-overdue);
   --font-sans:
-    ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, sans-serif;
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI",
+    system-ui, sans-serif;
+  --shadow-glass: var(--glass-shadow);
+}
+
+html {
+  background: #eef1f7;
 }
 
 body {
-  background: var(--cream);
   color: var(--ink);
   font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+  /* Weicher Farbverlauf als Bühne für das Glas */
+  background:
+    radial-gradient(60rem 40rem at 10% -10%, #dbe7ff 0%, transparent 60%),
+    radial-gradient(50rem 36rem at 110% 10%, #f3e1ff 0%, transparent 55%),
+    radial-gradient(60rem 40rem at 50% 120%, #d9f5ec 0%, transparent 60%),
+    #eef1f7;
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Glasfläche: durchscheinend, unscharf dahinter, feine Lichtkante. */
+@utility glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 0 rgb(255 255 255 / 0.85);
+}
+
+/* Für Leisten und Sheets, die über bewegtem Inhalt liegen. */
+@utility glass-strong {
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid var(--glass-edge);
+  box-shadow:
+    0 10px 40px rgb(30 41 59 / 0.14),
+    inset 0 1px 0 rgb(255 255 255 / 0.9);
+}
+
+/* Feine Kante für kleinere Elemente (Chips, Kacheln, Felder). */
+@utility glass-edge {
+  border: 1px solid rgb(0 0 0 / 0.08);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
 }
 
 /* Überfällig: langsames rotes Pulsieren, 2 s Zyklus (Spez. 12.8). */

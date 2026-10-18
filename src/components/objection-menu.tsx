@@ -21,7 +21,7 @@ export function ObjectionMenu({
       >
         …
       </summary>
-      <div className="absolute right-0 bottom-full z-20 mb-1 w-64 rounded-xl border-2 border-ink bg-cream p-3 shadow-[0_4px_0_0_var(--ink)]">
+      <div className="absolute right-0 bottom-full z-20 mb-1 w-64 glass-strong rounded-2xl p-3">
         <form action={action} className="flex flex-col gap-2">
           <input type="hidden" name="completionId" value={completionId} />
           <p className="text-xs text-ink/70">
@@ -30,9 +30,9 @@ export function ObjectionMenu({
           </p>
           <button
             disabled={pending}
-            className="rounded-lg border-2 border-ink bg-white px-3 py-1.5 text-sm font-semibold text-status-overdue"
+            className="rounded-full glass px-3 py-1.5 text-sm font-semibold text-status-overdue"
           >
-            ✋ Nicht erledigt
+            Nicht erledigt
           </button>
           <FormMessage state={state} />
         </form>

@@ -74,7 +74,7 @@ export default async function TaskPage({
         <div className="flex items-center gap-3">
           <span
             aria-hidden
-            className="flex size-14 items-center justify-center rounded-xl border-2 border-ink text-3xl"
+            className="flex size-14 items-center justify-center rounded-2xl glass-edge text-3xl"
             style={{ backgroundColor: `${t.color}66` }}
           >
             {objectEmoji(t.objectType)}
@@ -142,10 +142,10 @@ export default async function TaskPage({
             <div className="flex gap-2">
               <a
                 href={`/api/ics/${c.id}`}
-                className="flex-1 rounded-xl border-2 border-b-4 border-ink bg-white px-3 py-2 text-center text-sm font-semibold"
+                className="flex-1 rounded-full glass px-3 py-2 text-center text-sm font-semibold"
                 download
               >
-                📅 In den Kalender
+                In den Kalender
               </a>
               <form action={cancelCommitmentAction}>
                 <input type="hidden" name="commitmentId" value={c.id} />
@@ -234,7 +234,7 @@ export default async function TaskPage({
       </section>
 
       {canEdit && (
-        <details className="rounded-2xl border-2 border-ink/40 p-4">
+        <details className="rounded-2xl border border-black/10 p-4">
           <summary className="cursor-pointer font-bold">Bearbeiten</summary>
           <div className="mt-3 flex flex-col gap-4">
             <TaskEditForm task={t} />

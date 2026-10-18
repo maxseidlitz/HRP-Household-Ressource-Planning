@@ -7,9 +7,9 @@ import { createFeedbackAction } from "@/server/actions/admin";
 import type { FormState } from "@/server/actions/result";
 
 const CATEGORIES = [
-  ["bug", "🐞 Bug"],
-  ["idea", "💡 Idee"],
-  ["other", "💬 Sonstiges"],
+  ["bug", "Bug"],
+  ["idea", "Idee"],
+  ["other", "Sonstiges"],
 ] as const;
 const MAX_BYTES = 5 * 1024 * 1024;
 
@@ -47,7 +47,7 @@ export function FeedbackForm({ screen }: { screen: string }) {
         {CATEGORIES.map(([value, label], i) => (
           <label
             key={value}
-            className="flex-1 cursor-pointer rounded-xl border-2 border-ink bg-white px-2 py-2 text-center text-sm font-semibold has-checked:bg-ink has-checked:text-cream"
+            className="flex-1 cursor-pointer rounded-full glass px-2 py-2 text-center text-sm font-semibold has-checked:bg-ink has-checked:text-white"
           >
             <input
               type="radio"
@@ -68,7 +68,7 @@ export function FeedbackForm({ screen }: { screen: string }) {
           rows={5}
           maxLength={4000}
           placeholder="Was ist passiert, was hast du erwartet?"
-          className="rounded-lg border-2 border-ink/30 bg-white px-3 py-2 text-base font-normal outline-none focus:border-sage-dark"
+          className="rounded-xl border border-black/10 bg-white/70 px-3.5 py-2.5 text-base font-normal outline-none transition focus:border-sage focus:bg-white focus:ring-4 focus:ring-sage/15"
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-medium">

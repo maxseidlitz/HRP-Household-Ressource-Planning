@@ -67,7 +67,7 @@ export function CompleteButton({
         onClick={onClick}
         disabled={pending}
         aria-label={`${taskName} erledigt`}
-        className={`rounded-xl border-2 border-ink border-b-4 bg-status-fresh font-bold text-white transition active:translate-y-0.5 active:border-b-2 disabled:opacity-60 ${compact ? "px-3 py-1.5 text-sm" : "w-full px-4 py-3"}`}
+        className={`rounded-full bg-status-fresh font-semibold text-white shadow-[0_4px_14px_rgb(48_193_88/0.35)] transition active:scale-[0.95] disabled:opacity-60 ${compact ? "size-9 text-base" : "w-full px-4 py-3"}`}
       >
         {pending
           ? "…"
@@ -78,12 +78,12 @@ export function CompleteButton({
       {feedback && (
         <span
           role="status"
-          className={`pointer-events-none absolute right-0 bottom-full z-10 mb-1 whitespace-nowrap rounded-lg border-2 border-ink px-2 py-0.5 text-sm font-bold ${
+          className={`pointer-events-none absolute right-0 bottom-full z-10 mb-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-sm font-semibold shadow-glass ${
             feedback.kind === "points"
-              ? "animate-float-up bg-status-sweet font-mono text-lg"
+              ? "animate-float-up bg-white text-lg text-status-fresh tabular-nums"
               : feedback.kind === "error"
                 ? "bg-status-overdue text-white"
-                : "animate-float-up bg-cream"
+                : "animate-float-up glass"
           }`}
         >
           {feedback.text}

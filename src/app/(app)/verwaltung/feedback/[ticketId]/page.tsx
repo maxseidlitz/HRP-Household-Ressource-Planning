@@ -48,7 +48,7 @@ export default async function TicketPage({
             <img
               src={`/api/feedback/${t.id}/screenshot`}
               alt="Screenshot zum Feedback"
-              className="max-h-96 rounded-xl border-2 border-ink object-contain"
+              className="max-h-96 rounded-xl glass-edge object-contain"
             />
           </a>
         )}

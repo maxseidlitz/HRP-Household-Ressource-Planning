@@ -62,7 +62,7 @@ braucht es nicht.
 | :--------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
 | <img src="docs/screenshots/03-raum.png" width="240" alt="Objekt mit Aufgabenvorschlägen hinzufügen"> | <img src="docs/screenshots/08-profil.png" width="240" alt="Avatar-Editor"> | <img src="docs/screenshots/02-wg-erstellen.png" width="240" alt="WG erstellen"> |
 
-> Stand: Phase 4. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
+> Stand: Phase 4 im Liquid-Glass-Design. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
 > (`npm run screenshots`).
 
 ## ✨ Funktionen
@@ -78,6 +78,7 @@ braucht es nicht.
 | 🎮  | Isometrisches Diorama (PixiJS): Voxel-Möbel in Statusfarben, Fliegen & Gerüche, Avatare mit Wegfindung, Putz-Animation, Drehen/Zoomen, 2D-Fallback | ✅ Phase 2  |
 | ⏰  | Einplanen mit Wecker-Icon, Kalender-Export (.ics mit Erinnerung), Mitteilungen mit Badge, Urlaub mit Urlaubspaket und Koffer-Avatar                | ✅ Phase 3  |
 | 📊  | Admin-Statistiken, Feedback-Tickets mit Screenshot, Einstellungen, JSON-Export, Widerspruch per Abstimmung                                         | ✅ Phase 4  |
+| 🪟  | Modernes Liquid-Glass-Design: Glasflächen, schwebende Tab-Leiste, Linien-Icons                                                                     | ✅          |
 | 🔔  | HTTPS, PWA-Installation, Push-Benachrichtigungen                                                                                                   | Phase 5     |
 
 Details: [Spezifikation](docs/SPEC.md) · [Umsetzungsplan](docs/PLAN.md)

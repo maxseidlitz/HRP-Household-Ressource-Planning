@@ -1,11 +1,11 @@
 import type { ComponentProps } from "react";
 
 const BUTTON_VARIANTS = {
-  primary: "bg-sage",
-  secondary: "bg-cream",
+  primary: "bg-sage text-white shadow-[0_4px_14px_rgb(10_132_255/0.3)]",
+  secondary: "glass text-ink",
 };
 
-/** Button mit leichtem 3D-Kanten-Look passend zum Diorama (Spez. 12.6). */
+/** Kapsel-Button im Liquid-Glass-Stil. */
 export function Button({
   variant = "primary",
   className = "",
@@ -13,11 +13,14 @@ export function Button({
 }: ComponentProps<"button"> & { variant?: keyof typeof BUTTON_VARIANTS }) {
   return (
     <button
-      className={`rounded-xl border-2 border-ink border-b-4 px-4 py-2.5 font-semibold text-ink transition active:translate-y-0.5 active:border-b-2 disabled:opacity-60 ${BUTTON_VARIANTS[variant]} ${className}`}
+      className={`rounded-full px-5 py-2.5 font-semibold transition active:scale-[0.97] disabled:opacity-50 ${BUTTON_VARIANTS[variant]} ${className}`}
       {...props}
     />
   );
 }
+
+export const inputClass =
+  "rounded-xl border border-black/10 bg-white/70 px-3.5 py-2.5 text-base font-normal outline-none transition focus:border-sage focus:bg-white focus:ring-4 focus:ring-sage/15";
 
 export function Field({
   label,
@@ -25,22 +28,14 @@ export function Field({
   ...props
 }: ComponentProps<"input"> & { label: string; hint?: string }) {
   return (
-    <label className="flex flex-col gap-1 text-sm font-medium">
+    <label className="flex flex-col gap-1.5 text-sm font-medium text-ink/80">
       {label}
-      <input
-        className="rounded-lg border-2 border-ink/30 bg-white px-3 py-2 text-base font-normal outline-none focus:border-sage-dark"
-        {...props}
-      />
-      {hint && <span className="text-xs font-normal text-ink/60">{hint}</span>}
+      <input className={inputClass} {...props} />
+      {hint && <span className="text-xs font-normal text-ink/55">{hint}</span>}
     </label>
   );
 }
 
 export function Card({ className = "", ...props }: ComponentProps<"div">) {
-  return (
-    <div
-      className={`rounded-2xl border-2 border-ink bg-cream-dark/60 p-6 shadow-[0_4px_0_0_var(--ink)] ${className}`}
-      {...props}
-    />
-  );
+  return <div className={`glass rounded-3xl p-5 ${className}`} {...props} />;
 }

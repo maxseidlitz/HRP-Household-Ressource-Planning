@@ -33,7 +33,7 @@ export function TaskPicker({
       {rows.map((row, i) => (
         <fieldset
           key={i}
-          className={`rounded-xl border-2 p-2.5 ${row.selected ? "border-ink bg-white" : "border-ink/20 bg-white/40"}`}
+          className={`rounded-xl border p-2.5 ${row.selected ? "border-sage/60 bg-white/90 shadow-glass" : "border-black/5 bg-white/40"}`}
         >
           <legend className="sr-only">Aufgabe {row.name || i + 1}</legend>
           <div className="flex items-center gap-2">
@@ -95,7 +95,7 @@ export function TaskPicker({
                 <select
                   name={`task.${i}.lastDone`}
                   defaultValue="unknown"
-                  className="rounded-md border border-ink/20 bg-white px-2 py-1 text-sm"
+                  className="rounded-lg border border-black/10 bg-white/80 px-2 py-1 text-sm"
                 >
                   {LAST_DONE.map(([v, l]) => (
                     <option key={v} value={v}>

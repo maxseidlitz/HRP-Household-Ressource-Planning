@@ -13,22 +13,22 @@ import type { PlanGroup, PlanObject, PlanRoom } from "@/server/queries/plan";
 
 /** Größe einer Kachel in SVG-Einheiten. */
 export const TILE = 24;
-const INK = "#2f2a24";
+const INK = "#3a3a3c";
 
 /** Böden je Raumtyp (Spez. 12.3): Fliesen, Dielen, Laminat. */
 const FLOORS: Record<
   RoomType,
   { fill: string; pattern: "tiles" | "planks" | "plain" }
 > = {
-  kitchen: { fill: "#ece6d8", pattern: "tiles" },
-  bath: { fill: "#dfe8ea", pattern: "tiles" },
-  wc: { fill: "#dfe8ea", pattern: "tiles" },
-  hallway: { fill: "#eadcc0", pattern: "planks" },
-  living: { fill: "#dcc29a", pattern: "planks" },
-  bedroom: { fill: "#dcc29a", pattern: "planks" },
-  balcony: { fill: "#d7e2cc", pattern: "plain" },
-  storage: { fill: "#e3dccd", pattern: "plain" },
-  other: { fill: "#ebe3d2", pattern: "plain" },
+  kitchen: { fill: "#eceef2", pattern: "tiles" },
+  bath: { fill: "#e2edf3", pattern: "tiles" },
+  wc: { fill: "#e2edf3", pattern: "tiles" },
+  hallway: { fill: "#eee8df", pattern: "planks" },
+  living: { fill: "#e6dac8", pattern: "planks" },
+  bedroom: { fill: "#e6dac8", pattern: "planks" },
+  balcony: { fill: "#e2ede0", pattern: "plain" },
+  storage: { fill: "#e9e9ed", pattern: "plain" },
+  other: { fill: "#edece9", pattern: "plain" },
 };
 
 export function planViewBox(rooms: PlanRoom[], margin = 1) {
@@ -77,7 +77,7 @@ function Defs() {
         patternUnits="userSpaceOnUse"
         patternTransform="rotate(45)"
       >
-        <rect width="6" height="6" fill="#d3ccbf" />
+        <rect width="6" height="6" fill="#d6d6dc" />
         <path d="M 0 0 V 6" stroke={INK} strokeOpacity="0.15" strokeWidth="2" />
       </pattern>
     </defs>
@@ -176,16 +176,16 @@ export function RoomShape({
         </>
       )}
       {selected && (
-        <TileRects tiles={room.tiles} fill="#8fa98a" opacity={0.35} />
+        <TileRects tiles={room.tiles} fill="#0a84ff" opacity={0.12} />
       )}
-      <g stroke={INK} strokeWidth={3} strokeLinecap="square">
+      <g stroke={INK} strokeWidth={2.5} strokeLinecap="square">
         {walls
           .filter((e) => !doors.has(doorKey(e)))
           .map((e) => (
             <line key={doorKey(e)} {...edgeLine(e)} />
           ))}
       </g>
-      <g stroke="#f6efe2" strokeWidth={4}>
+      <g stroke="#f4f5f8" strokeWidth={4}>
         {room.doors.map((d) => (
           <line key={doorKey(d)} {...edgeLine(d)} />
         ))}
@@ -332,7 +332,7 @@ export function ObjectShape({
           height={ph}
           rx={6}
           fill="none"
-          stroke="#5f7a5a"
+          stroke="#0a84ff"
           strokeWidth={2}
           strokeDasharray="4 3"
         />
@@ -367,7 +367,7 @@ export function GroupShape({
       width={(b.maxX - b.minX + 1) * TILE - 2}
       height={(b.maxY - b.minY + 1) * TILE - 2}
       rx={5}
-      fill="#c9b08a"
+      fill="#d1d1d6"
       stroke={INK}
       strokeWidth={2}
     >

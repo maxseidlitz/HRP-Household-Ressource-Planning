@@ -51,7 +51,7 @@ export function CopyField({
           readOnly
           value={value}
           aria-label={label}
-          className="min-w-0 flex-1 rounded-lg border-2 border-ink/30 bg-white px-2 py-1.5 text-sm"
+          className="min-w-0 flex-1 rounded-lg border border-black/10 bg-white px-2 py-1.5 text-sm"
           onFocus={(e) => e.currentTarget.select()}
         />
         <Button

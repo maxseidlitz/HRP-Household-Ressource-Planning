@@ -266,12 +266,12 @@ test("README-Screenshots", async ({ browser }) => {
   // Anna plant den Herd ein (Wecker-Icon), Ben ist im Urlaub (Koffer)
   await others.Anna.getByRole("link", { name: /Herd reinigen/ }).click();
   await others.Anna.getByRole("button", { name: "Morgen 18 Uhr" }).click();
-  await others.Anna.getByRole("button", { name: "⏰ Ich mach das" }).click();
+  await others.Anna.getByRole("button", { name: "Ich mach das" }).click();
   await expect(others.Anna.getByTestId("commitment")).toBeVisible();
   await others.Ben.goto("/urlaub");
   await others.Ben.getByLabel("Von").fill(day(0));
   await others.Ben.getByLabel("Bis (einschließlich)").fill(day(6));
-  await others.Ben.getByRole("button", { name: "🧳 Urlaub eintragen" }).click();
+  await others.Ben.getByRole("button", { name: "Urlaub eintragen" }).click();
   await expect(others.Ben.getByTestId("absence")).toContainText(
     "Du bist im Urlaub",
   );
@@ -324,7 +324,7 @@ test("README-Screenshots", async ({ browser }) => {
   await max.goto("/aufgaben");
   await max.getByRole("link", { name: /Restmüll/ }).click();
   await max.getByRole("button", { name: "Morgen 18 Uhr" }).click();
-  await max.getByRole("button", { name: "⏰ Ich mach das" }).click();
+  await max.getByRole("button", { name: "Ich mach das" }).click();
   await expect(max.getByTestId("commitment")).toBeVisible();
   await max.getByRole("heading", { name: "Einplanen" }).evaluate((el) => {
     window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 90);
@@ -335,7 +335,7 @@ test("README-Screenshots", async ({ browser }) => {
   await max.goto("/urlaub");
   await max.getByLabel("Von").fill(day(10));
   await max.getByLabel("Bis (einschließlich)").fill(day(17));
-  await max.getByRole("button", { name: "🧳 Urlaub eintragen" }).click();
+  await max.getByRole("button", { name: "Urlaub eintragen" }).click();
   await max
     .getByRole("button", {
       name: "Eigene Sachen im Kühlschrank prüfen abhaken",
@@ -370,7 +370,7 @@ test("README-Screenshots", async ({ browser }) => {
   await others.Anna.goto("/aufgaben");
   await others.Anna.getByRole("link", { name: /Waschbecken/ }).click();
   await others.Anna.getByLabel("Optionen für die Erledigung von Ben").click();
-  await others.Anna.getByRole("button", { name: "✋ Nicht erledigt" }).click();
+  await others.Anna.getByRole("button", { name: "Nicht erledigt" }).click();
   await expect(others.Anna).toHaveURL(/\/widerspruch\//);
   await max.goto("/aufgaben");
   await max.getByTestId("pending-vote").click();
@@ -379,7 +379,7 @@ test("README-Screenshots", async ({ browser }) => {
 
   // Feedback von Anna, Admin-Ansicht
   await others.Anna.goto("/feedback?von=%2Fwohnung");
-  await others.Anna.locator("label", { hasText: "💡 Idee" }).click();
+  await others.Anna.locator("label", { hasText: "Idee" }).click();
   await others.Anna.getByLabel("Beschreibung").fill(
     "Können wir im Diorama auch Wäscheständer aufstellen? Der steht bei uns ständig im Flur. 😄",
   );

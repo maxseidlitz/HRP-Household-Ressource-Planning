@@ -120,7 +120,7 @@ export function PlanViewer({
     <div
       role="group"
       aria-label="Darstellung"
-      className="flex rounded-lg border-2 border-ink bg-white/60 p-0.5 text-sm font-bold"
+      className="flex rounded-full bg-black/[0.06] p-0.5 text-sm font-semibold"
     >
       {(
         [
@@ -134,7 +134,7 @@ export function PlanViewer({
           aria-pressed={(m === "3d") === show3d}
           disabled={m === "3d" && !isoAvailable}
           onClick={() => switchMode(m)}
-          className={`rounded-md px-3 py-1 disabled:opacity-40 ${(m === "3d") === show3d ? "bg-ink text-cream" : ""}`}
+          className={`rounded-full px-3 py-1 disabled:opacity-40 ${(m === "3d") === show3d ? "bg-white text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]" : "text-ink/60"}`}
         >
           {label}
         </button>
@@ -200,7 +200,7 @@ export function PlanViewer({
       </ul>
       {allGreen && (
         <p
-          className="mt-3 text-center font-mono text-lg font-bold"
+          className="mt-3 text-center tabular-nums text-lg font-bold"
           role="status"
         >
           ✨ Alles sauber.
@@ -210,7 +210,7 @@ export function PlanViewer({
       {selected && selectedObject ? (
         <section
           aria-label={`Aufgaben: ${selectedObject.name}`}
-          className="fixed inset-x-0 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-10 mx-auto max-w-xl rounded-t-2xl border-2 border-b-0 border-ink bg-cream p-4 shadow-[0_-4px_0_0_rgba(47,42,36,0.15)]"
+          className="fixed inset-x-0 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-10 mx-3 max-w-xl rounded-3xl glass-strong p-4 sm:mx-auto"
         >
           <div className="mb-3 flex items-center gap-2">
             <span aria-hidden className="text-2xl">
@@ -228,7 +228,7 @@ export function PlanViewer({
             <button
               type="button"
               onClick={() => setSelected(null)}
-              className="rounded-lg border-2 border-ink px-2 text-sm font-bold"
+              className="glass flex size-8 items-center justify-center rounded-full text-sm"
               aria-label="Schließen"
             >
               ✕
@@ -264,7 +264,7 @@ export function PlanViewer({
         next.length > 0 && (
           <section
             aria-label="Als Nächstes"
-            className="fixed inset-x-0 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-10 mx-auto max-w-xl rounded-t-2xl border-2 border-b-0 border-ink bg-cream px-4 pt-2 pb-3"
+            className="fixed inset-x-0 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-10 mx-3 max-w-xl rounded-3xl glass-strong px-4 pt-2 pb-3 sm:mx-auto"
           >
             <button
               type="button"

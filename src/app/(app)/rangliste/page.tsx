@@ -45,7 +45,7 @@ export default async function LeaderboardPage({
     return (
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold">Rangliste</h1>
-        <p className="rounded-2xl border-2 border-dashed border-ink/40 p-6 text-center text-sm">
+        <p className="rounded-2xl border border-dashed border-black/15 p-6 text-center text-sm">
           Die Rangliste erscheint, sobald mindestens zwei Personen in der WG
           sind.
         </p>
@@ -59,7 +59,7 @@ export default async function LeaderboardPage({
       <div
         role="tablist"
         aria-label="Zeitraum"
-        className="grid grid-cols-2 rounded-xl border-2 border-ink bg-white/60 p-1"
+        className="grid grid-cols-2 rounded-full bg-black/[0.06] p-0.5"
       >
         {(
           [
@@ -72,7 +72,7 @@ export default async function LeaderboardPage({
             href={href}
             role="tab"
             aria-selected={period === p}
-            className={`rounded-lg py-1.5 text-center text-sm font-bold ${period === p ? "bg-ink text-cream" : ""}`}
+            className={`rounded-full py-1.5 text-center text-sm font-semibold ${period === p ? "bg-white text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]" : "text-ink/60"}`}
           >
             {label}
           </Link>
@@ -100,12 +100,12 @@ export default async function LeaderboardPage({
                 {away.has(m.userId) && " 🧳"}
               </span>
               <div
-                className={`${height} flex w-full flex-col items-center justify-start rounded-t-xl border-2 border-ink bg-status-sweet/50 pt-1`}
+                className={`${height} flex w-full flex-col items-center justify-start rounded-t-2xl glass pt-1`}
               >
                 <span aria-hidden className="text-xl">
                   {e.points > 0 ? (MEDALS[e.rank - 1] ?? "") : ""}
                 </span>
-                <span className="font-mono text-sm font-bold">
+                <span className="tabular-nums text-sm font-bold">
                   {formatPoints(e.points)}
                 </span>
               </div>
@@ -121,7 +121,7 @@ export default async function LeaderboardPage({
           return (
             <li
               key={e.userId}
-              className={`flex items-center gap-3 rounded-xl border-2 px-3 py-2 ${me ? "border-ink bg-sage/30" : "border-transparent bg-white/60"}`}
+              className={`flex items-center gap-3 rounded-xl border px-3 py-2 ${me ? "border-sage/40 bg-sage/10" : "border-transparent bg-white/60"}`}
             >
               <span className="w-6 text-center font-bold">{e.rank}.</span>
               <Avatar
@@ -135,7 +135,7 @@ export default async function LeaderboardPage({
                 {me && <span className="text-xs font-normal"> (du)</span>}
               </span>
               <span className="text-xs text-ink/60">{e.completions}×</span>
-              <span className="w-14 text-right font-mono font-bold">
+              <span className="w-14 text-right tabular-nums font-bold">
                 {formatPoints(e.points)}
               </span>
             </li>

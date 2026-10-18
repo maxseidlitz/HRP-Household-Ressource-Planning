@@ -36,7 +36,7 @@ export default async function InvitesPage() {
         return (
           <section
             key={i.id}
-            className="flex flex-col items-center gap-3 rounded-2xl border-2 border-ink bg-white/70 p-4"
+            className="flex flex-col items-center gap-3 rounded-2xl glass p-4"
             aria-label="Aktiver Einladungslink"
           >
             <QrCode value={url} />
@@ -58,7 +58,7 @@ export default async function InvitesPage() {
         );
       })}
 
-      <section className="rounded-2xl border-2 border-ink/40 p-4">
+      <section className="rounded-2xl border border-black/10 p-4">
         <h2 className="mb-3 font-bold">
           {active.length
             ? "Weiteren Link erstellen"
@@ -67,7 +67,7 @@ export default async function InvitesPage() {
         <CreateInviteForm />
       </section>
 
-      <details className="rounded-2xl border-2 border-ink/40 p-4">
+      <details className="rounded-2xl border border-black/10 p-4">
         <summary className="cursor-pointer font-bold">
           Erwartete Mitglieder
         </summary>

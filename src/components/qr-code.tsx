@@ -18,7 +18,7 @@ export async function QrCode({
     <div
       role="img"
       aria-label="QR-Code"
-      className="overflow-hidden rounded-xl border-2 border-ink bg-white"
+      className="overflow-hidden rounded-xl glass-edge bg-white"
       style={{ width: size, height: size }}
       dangerouslySetInnerHTML={{ __html: svg }}
     />

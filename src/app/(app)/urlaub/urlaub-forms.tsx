@@ -23,7 +23,7 @@ export function AbsenceForm({ min }: { min: string }) {
           min={min}
         />
       </div>
-      <Button disabled={pending}>🧳 Urlaub eintragen</Button>
+      <Button disabled={pending}>Urlaub eintragen</Button>
       <FormMessage state={state} success="Urlaub eingetragen. Gute Reise!" />
     </form>
   );
@@ -55,7 +55,7 @@ export function VacationItem({
       <button
         disabled={done || pending}
         aria-label={done ? `${label}: erledigt` : `${label} abhaken`}
-        className={`flex size-8 shrink-0 items-center justify-center rounded-lg border-2 border-ink text-lg font-bold ${done ? "bg-sage" : "bg-white"}`}
+        className={`flex size-8 shrink-0 items-center justify-center rounded-lg text-base font-bold ${done ? "bg-sage text-white" : "border border-black/15 bg-white/70"}`}
       >
         {done ? "✓" : ""}
       </button>

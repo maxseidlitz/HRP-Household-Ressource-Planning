@@ -38,7 +38,7 @@ export function CreateRoomForm({
                 }}
                 className="peer sr-only"
               />
-              <span className="flex flex-col items-center rounded-lg border-2 border-ink/30 bg-white py-2 text-xs font-semibold peer-checked:border-ink peer-checked:bg-sage/40 peer-focus-visible:ring-2">
+              <span className="flex flex-col items-center rounded-xl border border-black/10 bg-white/70 py-2 text-xs font-semibold peer-checked:border-sage peer-checked:bg-sage/10 peer-checked:ring-2 peer-checked:ring-sage/40 peer-focus-visible:ring-2">
                 <span aria-hidden className="text-xl">
                   {ROOM_TYPE_EMOJI[t]}
                 </span>
@@ -64,7 +64,7 @@ export function CreateRoomForm({
           Privates Zimmer von
           <select
             name="privateOwnerId"
-            className="rounded-lg border-2 border-ink/30 bg-white px-3 py-2 text-base font-normal"
+            className="rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-base font-normal outline-none focus:border-sage focus:ring-4 focus:ring-sage/15"
             defaultValue=""
           >
             <option value="">— niemandem (Gemeinschaftsraum) —</option>

@@ -14,7 +14,10 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       <h1 className="mb-1 text-2xl font-bold">Willkommen zurück</h1>
       <p className="mb-6 text-sm text-ink/70">Melde dich bei deiner WG an.</p>
       {reset && (
-        <p role="status" className="mb-4 rounded-lg bg-sage/30 p-2 text-sm">
+        <p
+          role="status"
+          className="mb-4 rounded-xl bg-sage/10 p-2.5 text-sm text-sage-dark"
+        >
           Passwort geändert. Melde dich mit dem neuen Passwort an.
         </p>
       )}

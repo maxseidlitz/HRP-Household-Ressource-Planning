@@ -11,7 +11,7 @@ export function FeedbackLink({ className }: { className?: string }) {
       href={`/feedback?von=${encodeURIComponent(pathname)}`}
       className={className}
     >
-      💬 Feedback senden
+      Feedback senden
     </Link>
   );
 }
