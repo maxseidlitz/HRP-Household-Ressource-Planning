@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* Warme, gedeckte Grundpalette (Spez. 12.3), damit Statusfarben herausstechen. */
+:root {
+  --cream: #f6efe2;
+  --cream-dark: #eadfca;
+  --wood: #8a6a4b;
+  --wood-dark: #5c4430;
+  --sage: #8fa98a;
+  --sage-dark: #5f7a5a;
+  --dusty-blue: #7d97ad;
+  --ink: #2f2a24;
+  --status-fresh: #4caf50;
+  --status-sweet: #c6d83a;
+  --status-soon: #f29a2e;
+  --status-overdue: #e04a3c;
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-cream-dark: var(--cream-dark);
+  --color-wood: var(--wood);
+  --color-wood-dark: var(--wood-dark);
+  --color-sage: var(--sage);
+  --color-sage-dark: var(--sage-dark);
+  --color-dusty-blue: var(--dusty-blue);
+  --color-ink: var(--ink);
+  --color-status-fresh: var(--status-fresh);
+  --color-status-sweet: var(--status-sweet);
+  --color-status-soon: var(--status-soon);
+  --color-status-overdue: var(--status-overdue);
+  --font-sans:
+    ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}

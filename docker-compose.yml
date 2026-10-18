@@ -1,0 +1,21 @@
+# Start im Heimnetz:  docker compose up -d
+# Danach erreichbar unter http://<zimaboard-ip>:3000
+name: hrp
+
+services:
+  app:
+    image: ghcr.io/maxseidlitz/hrp-household-ressource-planning:latest
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Zeitzone für Logs; die App rechnet mit der Zeitzone der WG.
+      TZ: Europe/Berlin
+      # Optional: Hostnamen einschränken, z. B. "192.168.1.20:3000,zimaboard.local:3000"
+      # ALLOWED_HOSTS: "*"
+      # Optional: eigenes Secret (sonst wird beim ersten Start eins in /data erzeugt)
+      # BETTER_AUTH_SECRET: ""
+    volumes:
+      # Auf ZimaOS üblich: /DATA/AppData/<app>
+      - /DATA/AppData/hrp:/data
