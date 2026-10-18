@@ -33,6 +33,8 @@ export type PlanRoom = {
   tiles: Tile[];
   doors: Door[];
   parentRoomId: string | null;
+  /** Besitzer:in eines privaten Zimmers (für die Wege der Avatare). */
+  privateOwnerId: string | null;
   /** Fremdes privates Zimmer: nur Umriss und Namensschild. */
   foreign: boolean;
   ownerName: string | null;
@@ -140,6 +142,7 @@ export function getPlan(
       tiles: parseTiles(r.tilesJson),
       doors: parseDoors(r.doorsJson),
       parentRoomId: r.parentRoomId,
+      privateOwnerId: r.privateOwnerId,
       foreign,
       ownerName: ownerName ?? null,
       canEditOutline: r.parentRoomId
