@@ -3,7 +3,10 @@
 FROM node:22-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# better-sqlite3 bringt fertige Binaries mit (prebuilds/). Ohne
+# --ignore-scripts würde npm versuchen, es per node-gyp zu kompilieren, wofür
+# das schlanke Image weder Python noch Compiler hat.
+RUN npm ci --ignore-scripts
 
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
