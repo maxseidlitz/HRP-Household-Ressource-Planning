@@ -60,7 +60,7 @@ export default async function ObjectionPage({
         </p>
         {o.resolution ? (
           <p
-            className={`rounded-xl p-3 font-semibold ${o.resolution === "revoked" ? "bg-status-overdue/20" : "bg-sage/40"}`}
+            className={`rounded-xl p-3 font-semibold ${o.resolution === "revoked" ? "bg-status-overdue/10 text-status-overdue" : "bg-status-fresh/10 text-status-fresh"}`}
             role="status"
           >
             {o.resolution === "revoked"

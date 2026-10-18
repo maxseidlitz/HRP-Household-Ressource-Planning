@@ -21,10 +21,7 @@ export default async function MembersPage() {
           const isCreator = m.userId === creatorId;
           const isSelf = m.userId === ctx.user.id;
           return (
-            <li
-              key={m.userId}
-              className="rounded-2xl border-2 border-ink bg-white/70 p-3"
-            >
+            <li key={m.userId} className="rounded-2xl glass p-3">
               <div className="flex items-center gap-3">
                 <Avatar
                   config={parseAvatar(m.avatarJson, m.userId)}

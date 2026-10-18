@@ -68,29 +68,26 @@ export default async function RoomPage({
           href={`/plan/bearbeiten?raum=${r.id}`}
           className="mt-2 inline-block text-sm font-semibold underline"
         >
-          🗺️ Im Plan bearbeiten
+          Im Plan bearbeiten
         </Link>
       </div>
 
       {!canEdit ? (
-        <p className="rounded-2xl border-2 border-dashed border-ink/40 bg-ink/5 p-5 text-center text-sm">
+        <p className="rounded-2xl border border-dashed border-black/15 bg-ink/5 p-5 text-center text-sm">
           🔒 Das ist das private Zimmer von {owner?.name}. Nur {owner?.name}{" "}
           kann es einrichten und sieht, was darin ist.
         </p>
       ) : (
         <>
           {isPrivate && (
-            <p className="rounded-xl bg-sage/25 p-3 text-sm">
+            <p className="rounded-2xl bg-sage/10 p-3 text-sage-dark text-sm">
               🔒 Nur du siehst, was in diesem Zimmer ist. Aufgaben hier sind
               privat: keine Punkte, keine Statistik.
             </p>
           )}
           <ul className="flex flex-col gap-3">
             {contents.map((o) => (
-              <li
-                key={o.id}
-                className="rounded-2xl border-2 border-ink bg-white/70 p-3"
-              >
+              <li key={o.id} className="rounded-2xl glass p-3">
                 <div className="flex items-center gap-2">
                   <span aria-hidden className="text-2xl">
                     {objectEmoji(o.type)}
@@ -146,7 +143,7 @@ export default async function RoomPage({
               </li>
             ))}
           </ul>
-          <section className="rounded-2xl border-2 border-ink/40 p-4">
+          <section className="rounded-2xl border border-black/10 p-4">
             <h2 className="mb-3 font-bold">Objekt hinzufügen</h2>
             <AddObjectForm
               roomId={r.id}
@@ -155,7 +152,7 @@ export default async function RoomPage({
             />
           </section>
           {isOwnTopRoom && (
-            <section className="rounded-2xl border-2 border-ink/40 p-4">
+            <section className="rounded-2xl border border-black/10 p-4">
               <h2 className="mb-1 font-bold">Unterräume</h2>
               <p className="mb-3 text-xs text-ink/70">
                 Z. B. ein eigenes Bad oder eine Küchenzeile in deinem Zimmer.
@@ -196,7 +193,7 @@ export default async function RoomPage({
       )}
 
       {ctx.isAdmin && !r.parentRoomId && (
-        <details className="rounded-2xl border-2 border-ink/40 p-4">
+        <details className="rounded-2xl border border-black/10 p-4">
           <summary className="cursor-pointer font-bold">Raum verwalten</summary>
           <div className="mt-3 flex flex-col gap-3">
             {r.type === "bedroom" && (
@@ -207,7 +204,7 @@ export default async function RoomPage({
                   <select
                     name="privateOwnerId"
                     defaultValue={r.privateOwnerId ?? ""}
-                    className="rounded-lg border-2 border-ink/30 bg-white px-3 py-2 text-base font-normal"
+                    className="rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-base font-normal outline-none focus:border-sage focus:ring-4 focus:ring-sage/15"
                   >
                     <option value="">— niemandem (Gemeinschaftsraum) —</option>
                     {members.map((m) => (

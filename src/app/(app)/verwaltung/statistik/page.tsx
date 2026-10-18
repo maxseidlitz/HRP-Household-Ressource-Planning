@@ -12,12 +12,12 @@ import {
 } from "@/server/queries/stats";
 
 const SCREEN_LABELS: Record<string, string> = {
-  wohnung: "🏠 Wohnung",
-  aufgaben: "🧽 Aufgaben",
-  rangliste: "🏆 Rangliste",
-  mitteilungen: "🔔 Mitteilungen",
-  feedback: "💬 Feedback",
-  statistik: "📊 Statistik",
+  wohnung: "Wohnung",
+  aufgaben: "Aufgaben",
+  rangliste: "Rangliste",
+  mitteilungen: "Mitteilungen",
+  feedback: "Feedback",
+  statistik: "Statistik",
 };
 const ACTION_LABELS: Record<string, string> = {
   task_completed: "Erledigt",
@@ -152,14 +152,14 @@ export default async function StatsPage({
         <h1 className="text-2xl font-bold">Statistik</h1>
         <nav
           aria-label="Zeitraum"
-          className="flex rounded-lg border-2 border-ink bg-white/60 p-0.5 text-sm font-bold"
+          className="flex rounded-full bg-black/[0.06] p-0.5 text-sm font-semibold"
         >
           {STAT_RANGES.map((r) => (
             <Link
               key={r}
               href={`/verwaltung/statistik?tage=${r}`}
               aria-current={r === days ? "page" : undefined}
-              className={`rounded-md px-2.5 py-1 ${r === days ? "bg-ink text-cream" : ""}`}
+              className={`rounded-full px-2.5 py-1 ${r === days ? "bg-white text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]" : "text-ink/60"}`}
             >
               {r} T
             </Link>
@@ -173,10 +173,7 @@ export default async function StatsPage({
           ["Erledigt", String(s.tasks.completions)],
           ["Überfällig", pct(s.tasks.overdueShare)],
         ].map(([label, value]) => (
-          <div
-            key={label}
-            className="rounded-2xl border-2 border-ink bg-white/70 p-2"
-          >
+          <div key={label} className="rounded-2xl glass p-2">
             <span className="block text-xl font-bold">{value}</span>
             <span className="text-xs text-ink/70">{label}</span>
           </div>

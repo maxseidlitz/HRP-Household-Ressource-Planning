@@ -26,10 +26,10 @@ export function TaskRow({
   onCompleted?: (result: CompleteResult) => void;
 }) {
   return (
-    <li className="flex items-center gap-3 rounded-2xl border-2 border-ink bg-white/70 p-3 shadow-[0_3px_0_0_var(--ink)]">
+    <li className="flex items-center gap-3 rounded-2xl glass p-3">
       <span
         aria-hidden
-        className="flex size-11 shrink-0 items-center justify-center rounded-xl border-2 border-ink text-2xl"
+        className="flex size-11 shrink-0 items-center justify-center rounded-2xl glass-edge text-2xl"
         style={{ backgroundColor: `${t.color}55` }}
       >
         {objectEmoji(t.objectType)}

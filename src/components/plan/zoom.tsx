@@ -18,7 +18,7 @@ export function useZoom(initial = 1) {
 
 export function ZoomButtons({ z }: { z: ReturnType<typeof useZoom> }) {
   const cls =
-    "flex size-9 items-center justify-center rounded-lg border-2 border-ink bg-cream text-lg font-bold disabled:opacity-40";
+    "flex size-9 items-center justify-center glass rounded-full text-base font-semibold disabled:opacity-40";
   return (
     <div className="flex gap-1" role="group" aria-label="Zoom">
       <button

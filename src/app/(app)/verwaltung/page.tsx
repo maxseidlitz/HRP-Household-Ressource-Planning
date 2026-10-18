@@ -83,28 +83,38 @@ export default async function AdminPage() {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold">Admin</h1>
-      <ul className="flex flex-col gap-3">
+      <ul className="glass divide-y divide-black/5 overflow-hidden rounded-3xl">
         {steps.map((s) => (
           <li key={s.href}>
             <Link
               href={s.href}
-              className="flex items-center gap-3 rounded-2xl border-2 border-ink bg-white/70 p-4 shadow-[0_3px_0_0_var(--ink)]"
+              className="flex items-center gap-3 px-4 py-3 transition hover:bg-white/50"
             >
-              <span aria-hidden className="text-3xl">
+              <span
+                aria-hidden
+                className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/80 text-lg shadow-[0_1px_3px_rgb(0_0_0/0.08)]"
+              >
                 {s.icon}
               </span>
-              <span className="flex-1">
-                <span className="block font-bold">{s.title}</span>
-                <span className="block text-sm text-ink/70">{s.text}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold">{s.title}</span>
+                <span className="block truncate text-sm text-ink/60">
+                  {s.text}
+                </span>
               </span>
-              <span aria-hidden>{s.done ? "✅" : "→"}</span>
+              {!s.done && (
+                <span
+                  aria-label="offen"
+                  className="size-2 rounded-full bg-sage"
+                />
+              )}
+              <span aria-hidden className="text-xl text-ink/25">
+                ›
+              </span>
             </Link>
           </li>
         ))}
       </ul>
-      <p className="text-xs text-ink/60">
-        Statistiken, Feedback und weitere Einstellungen folgen in Phase 4.
-      </p>
     </div>
   );
 }

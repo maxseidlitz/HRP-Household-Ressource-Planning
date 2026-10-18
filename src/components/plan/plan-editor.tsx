@@ -251,7 +251,7 @@ export function PlanEditor({
 
   if (!room) {
     return (
-      <p className="rounded-2xl border-2 border-dashed border-ink/40 p-6 text-center text-sm">
+      <p className="rounded-2xl border border-dashed border-black/15 p-6 text-center text-sm">
         Es gibt noch keinen Raum, den du bearbeiten kannst.
       </p>
     );
@@ -274,7 +274,7 @@ export function PlanEditor({
                     setGroupPick([]);
                     setError(null);
                   }}
-                  className={`whitespace-nowrap rounded-full border-2 border-ink px-3 py-1 text-sm font-semibold ${r.id === roomId ? "bg-ink text-cream" : "bg-white/70"}`}
+                  className={`whitespace-nowrap rounded-full border border-black/5 px-3.5 py-1.5 text-sm font-medium shadow-[0_1px_2px_rgb(0_0_0/0.04)] ${r.id === roomId ? "bg-ink text-white" : "bg-white/70"}`}
                 >
                   {ROOM_TYPE_EMOJI[r.type]} {r.name}
                   {live.tiles.length === 0 && " · leer"}
@@ -289,7 +289,7 @@ export function PlanEditor({
       <div
         role="tablist"
         aria-label="Bearbeiten"
-        className="grid grid-cols-3 rounded-xl border-2 border-ink bg-white/60 p-1 text-sm"
+        className="grid grid-cols-3 rounded-full bg-black/[0.06] p-0.5 text-sm"
       >
         {(
           [
@@ -308,7 +308,7 @@ export function PlanEditor({
               setMode(m);
               setError(null);
             }}
-            className={`rounded-lg py-1.5 font-bold disabled:opacity-40 ${mode === m ? "bg-ink text-cream" : ""}`}
+            className={`rounded-full py-1.5 font-semibold disabled:opacity-40 ${mode === m ? "bg-white text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]" : "text-ink/60"}`}
           >
             {label}
           </button>
@@ -319,9 +319,9 @@ export function PlanEditor({
         <div className="flex gap-2" role="group" aria-label="Werkzeug">
           {(
             [
-              ["add", "➕ Fläche"],
-              ["erase", "➖ Radieren"],
-              ["pan", "✋ Verschieben"],
+              ["add", "Fläche"],
+              ["erase", "Radieren"],
+              ["pan", "Verschieben"],
             ] as const
           ).map(([t, label]) => (
             <button
@@ -329,7 +329,7 @@ export function PlanEditor({
               type="button"
               aria-pressed={tool === t}
               onClick={() => setTool(t)}
-              className={`flex-1 rounded-lg border-2 px-2 py-1.5 text-sm font-semibold ${tool === t ? "border-ink bg-sage/50" : "border-ink/30 bg-white"}`}
+              className={`flex-1 rounded-lg border px-2 py-1.5 text-sm font-medium ${tool === t ? "border-sage bg-sage text-white" : "border-black/10 bg-white/70"}`}
             >
               {label}
             </button>
@@ -437,7 +437,7 @@ export function PlanEditor({
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                className="rounded-lg border-2 border-ink bg-cream px-3 py-1.5 text-sm font-semibold"
+                className="rounded-full glass px-3 py-1.5 text-sm font-semibold"
                 onClick={() => {
                   const r = nextRotation(rotation);
                   setRotation(r);
@@ -454,7 +454,7 @@ export function PlanEditor({
               {selected.placed && (
                 <button
                   type="button"
-                  className="rounded-lg border-2 border-ink bg-cream px-3 py-1.5 text-sm font-semibold"
+                  className="rounded-full glass px-3 py-1.5 text-sm font-semibold"
                   onClick={() => place(selected, null)}
                 >
                   In die Ablage
@@ -484,7 +484,7 @@ export function PlanEditor({
               {roomObjects.map((o) => (
                 <li key={o.id}>
                   <div
-                    className={`flex items-center gap-2 rounded-xl border-2 p-2 text-sm ${o.id === selectedObj ? "border-ink bg-sage/40" : "border-ink/30 bg-white"}`}
+                    className={`flex items-center gap-2 rounded-xl border p-2 text-sm ${o.id === selectedObj ? "border-sage/50 bg-sage/10" : "border-black/10 bg-white/70"}`}
                   >
                     <input
                       type="checkbox"
@@ -525,11 +525,11 @@ export function PlanEditor({
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 aria-label="Name der Gruppe"
-                className="min-w-0 flex-1 rounded-lg border-2 border-ink/30 bg-white px-2 py-1.5 text-sm"
+                className="min-w-0 flex-1 rounded-lg border border-black/10 bg-white px-2 py-1.5 text-sm"
               />
               <button
                 type="button"
-                className="rounded-lg border-2 border-ink bg-sage px-3 py-1.5 text-sm font-semibold"
+                className="rounded-full bg-sage px-3.5 py-1.5 text-sm font-semibold text-white"
                 onClick={() =>
                   run(
                     () =>

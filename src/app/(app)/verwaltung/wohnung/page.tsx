@@ -23,7 +23,7 @@ export default async function ApartmentPage({
       </Link>
       <h1 className="text-2xl font-bold">Wohnung</h1>
       {neu && (
-        <ol className="list-inside list-decimal rounded-xl border-2 border-ink bg-status-sweet/40 p-3 text-sm">
+        <ol className="list-inside list-decimal glass rounded-2xl p-3.5 text-sm">
           <li>Räume anlegen (auch die privaten Zimmer)</li>
           <li>In jedem Raum Objekte und Aufgaben auswählen</li>
           <li>
@@ -59,7 +59,7 @@ export default async function ApartmentPage({
               <li key={r.id}>
                 <Link
                   href={`/raum/${r.id}`}
-                  className={`flex items-center gap-3 rounded-xl border-2 border-ink p-3 ${foreignPrivate ? "bg-ink/10 text-ink/70" : "bg-white/70"}`}
+                  className={`flex items-center gap-3 rounded-2xl glass p-3 ${foreignPrivate ? "bg-ink/10 text-ink/70" : "bg-white/70"}`}
                 >
                   {body}
                 </Link>
@@ -69,7 +69,7 @@ export default async function ApartmentPage({
         </ul>
       )}
 
-      <section className="rounded-2xl border-2 border-ink/40 p-4">
+      <section className="rounded-2xl border border-black/10 p-4">
         <h2 className="mb-3 font-bold">Raum hinzufügen</h2>
         <CreateRoomForm
           members={members.map((m) => ({ id: m.userId, name: m.name }))}

@@ -53,7 +53,7 @@ export default async function VacationPage() {
         return (
           <Card
             key={a.id}
-            className={`flex flex-col gap-3 ${current ? "bg-status-sweet/30" : ""}`}
+            className={`flex flex-col gap-3 ${current ? "ring-2 ring-sage/30" : ""}`}
             data-testid="absence"
           >
             <div className="flex items-center gap-3">

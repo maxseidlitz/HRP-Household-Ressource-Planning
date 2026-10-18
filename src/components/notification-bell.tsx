@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BellIcon } from "./icons";
 import { useEffect, useSyncExternalStore } from "react";
 
 /**
@@ -67,17 +68,17 @@ export function NotificationBell({ initial }: { initial: Counts }) {
   return (
     <Link
       href="/mitteilungen"
-      className="relative flex size-9 items-center justify-center rounded-full border-2 border-ink bg-white text-lg"
+      className="glass relative flex size-9 items-center justify-center rounded-full text-ink/80"
       aria-label={
         current > 0 ? `Mitteilungen, ${current} ungelesen` : "Mitteilungen"
       }
       data-testid="bell"
     >
-      <span aria-hidden>🔔</span>
+      <BellIcon width={20} height={20} />
       {current > 0 && (
         <span
           aria-hidden
-          className="absolute -top-1.5 -right-1.5 min-w-5 rounded-full border-2 border-ink bg-status-overdue px-1 text-center text-[11px] leading-4 font-bold text-white"
+          className="absolute -top-1 -right-1 min-w-[18px] rounded-full bg-status-overdue px-1 text-center text-[11px] leading-[18px] font-semibold text-white shadow-[0_0_0_2px_white]"
           data-testid="bell-badge"
         >
           {current > 9 ? "9+" : current}
@@ -95,7 +96,7 @@ export function OtherHouseholdsDot({ initial }: { initial: Counts }) {
     <>
       <span
         aria-hidden
-        className="absolute -top-0.5 -right-0.5 size-3 rounded-full border-2 border-cream bg-status-overdue"
+        className="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-status-overdue shadow-[0_0_0_2px_white]"
         data-testid="other-dot"
       />
       <span className="sr-only">Neues in einer anderen WG</span>

@@ -55,7 +55,7 @@ export default async function FeedbackPage({
                   {t.text}
                 </p>
                 {t.adminReply && (
-                  <p className="mt-2 rounded-lg bg-sage/30 px-2 py-1.5">
+                  <p className="mt-2 rounded-xl bg-sage/10 px-2.5 py-1.5">
                     <strong>Antwort:</strong> {t.adminReply}
                   </p>
                 )}

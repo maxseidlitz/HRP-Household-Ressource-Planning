@@ -31,7 +31,7 @@ export function CreateHouseholdForm() {
                 defaultChecked={i === 0}
                 className="peer sr-only"
               />
-              <span className="flex size-10 items-center justify-center rounded-lg border-2 border-ink/30 bg-white text-xl peer-checked:border-ink peer-checked:bg-sage/40 peer-focus-visible:ring-2">
+              <span className="flex size-10 items-center justify-center rounded-xl border border-black/10 bg-white/70 text-xl peer-checked:border-sage peer-checked:bg-sage/10 peer-checked:ring-2 peer-checked:ring-sage/40 peer-focus-visible:ring-2">
                 {e}
               </span>
             </label>

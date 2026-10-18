@@ -27,14 +27,14 @@ test("Einplanen mit .ics, Mitteilungen und Urlaubspaket", async ({
     .click();
   await expect(page.getByRole("heading", { name: "Einplanen" })).toBeVisible();
   await page.getByRole("button", { name: "Morgen 18 Uhr" }).click();
-  await page.getByRole("button", { name: "⏰ Ich mach das" }).click();
+  await page.getByRole("button", { name: "Ich mach das" }).click();
   await expect(page.getByTestId("commitment")).toContainText(
     "Du hast das eingeplant",
   );
   await expect(page.getByTestId("commitment")).toContainText("18:00");
 
   // .ics mit Erinnerung 2 h vorher
-  const ics = page.getByRole("link", { name: "📅 In den Kalender" });
+  const ics = page.getByRole("link", { name: "In den Kalender" });
   const res = await page.request.get((await ics.getAttribute("href"))!);
   expect(res.headers()["content-type"]).toContain("text/calendar");
   const body = await res.text();
@@ -56,7 +56,7 @@ test("Einplanen mit .ics, Mitteilungen und Urlaubspaket", async ({
   await page.getByRole("button", { name: "Absagen" }).click();
   await expect(page.getByTestId("commitment")).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "⏰ Ich mach das" }),
+    page.getByRole("button", { name: "Ich mach das" }),
   ).toBeVisible();
 
   // --- Mitteilung: Anna tritt bei → Glocke zeigt 1 ---
@@ -83,7 +83,7 @@ test("Einplanen mit .ics, Mitteilungen und Urlaubspaket", async ({
   };
   await page.getByLabel("Von").fill(day(2));
   await page.getByLabel("Bis (einschließlich)").fill(day(5));
-  await page.getByRole("button", { name: "🧳 Urlaub eintragen" }).click();
+  await page.getByRole("button", { name: "Urlaub eintragen" }).click();
   await expect(page.getByTestId("absence")).toContainText("Geplanter Urlaub");
   await page
     .getByRole("button", {

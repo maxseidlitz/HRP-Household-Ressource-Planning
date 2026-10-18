@@ -93,7 +93,7 @@ function Swatches({
             aria-label={`${label} ${i + 1}`}
             aria-pressed={value === i}
             onClick={() => onChange(i)}
-            className={`size-8 rounded-full border-2 ${value === i ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-cream" : "border-ink/30"}`}
+            className={`size-8 rounded-full border ${value === i ? "border-white ring-2 ring-sage ring-offset-2 ring-offset-white" : "border-black/10"}`}
             style={{ backgroundColor: c }}
           />
         ))}
@@ -123,7 +123,7 @@ function Chips<T extends string>({
             type="button"
             aria-pressed={value === v}
             onClick={() => onChange(v)}
-            className={`rounded-full border-2 px-3 py-1 text-sm font-semibold ${value === v ? "border-ink bg-sage/50" : "border-ink/30 bg-white"}`}
+            className={`rounded-full border px-3 py-1 text-sm font-medium ${value === v ? "border-sage bg-sage text-white" : "border-black/10 bg-white/70"}`}
           >
             {l}
           </button>

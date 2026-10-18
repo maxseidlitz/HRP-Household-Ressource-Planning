@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { parseAvatar } from "@/catalog/avatar";
 import { Avatar } from "@/components/avatar";
+import { StarIcon } from "@/components/icons";
 import { FeedbackLink } from "@/components/feedback-link";
 import { HouseholdPrompts } from "@/components/household-prompts";
 import { LogoutButton } from "@/components/logout-button";
@@ -36,25 +37,26 @@ export default async function AppLayout({
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b-2 border-ink bg-cream/95 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-white/60 bg-white/55 backdrop-blur-2xl backdrop-saturate-200">
         <div className="mx-auto flex max-w-xl items-center gap-3 px-4 py-2.5">
           <Link href="/aufgaben" className="min-w-0 flex-1">
-            <span className="block truncate text-lg font-bold">
+            <span className="block truncate text-[17px] font-semibold">
               {ctx.household.emoji ? `${ctx.household.emoji} ` : ""}
               {ctx.household.name}
             </span>
           </Link>
           <span
-            className="rounded-full border-2 border-ink bg-status-sweet/60 px-2.5 py-0.5 text-sm font-bold"
+            className="glass flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-semibold tabular-nums"
             title="Deine Punkte in diesem Monat"
             data-testid="my-points"
           >
-            ⭐ {formatPoints(myPoints)}
+            <StarIcon width={14} height={14} className="text-status-soon" />
+            {formatPoints(myPoints)}
           </span>
           <NotificationBell initial={unread} />
           <MenuDetails className="relative">
             <summary
-              className="relative flex cursor-pointer list-none items-center rounded-full border-2 border-ink bg-white p-0.5 [&::-webkit-details-marker]:hidden"
+              className="glass relative flex cursor-pointer list-none items-center rounded-full p-0.5 [&::-webkit-details-marker]:hidden"
               aria-label="Profilmenü"
             >
               <Avatar config={avatar} size={28} title={ctx.user.name} />
@@ -63,8 +65,8 @@ export default async function AppLayout({
                 <span className="sr-only">WG wechseln</span>
               )}
             </summary>
-            <div className="absolute right-0 z-30 mt-2 w-64 rounded-xl border-2 border-ink bg-cream p-2 shadow-[0_4px_0_0_var(--ink)]">
-              <p className="px-2 pb-1 text-xs font-semibold text-ink/60">
+            <div className="glass-strong absolute right-0 z-30 mt-2 w-64 rounded-2xl p-2">
+              <p className="px-2.5 pb-1 text-xs font-medium text-ink/50">
                 Deine WGs
               </p>
               <ul className="mb-2">
@@ -73,7 +75,7 @@ export default async function AppLayout({
                     <form action={switchHouseholdAction}>
                       <input type="hidden" name="householdId" value={h.id} />
                       <button
-                        className={`w-full rounded-lg px-2 py-1.5 text-left text-sm ${h.id === ctx.household.id ? "bg-sage/40 font-bold" : "hover:bg-cream-dark"}`}
+                        className={`w-full rounded-xl px-2.5 py-2 text-left text-sm ${h.id === ctx.household.id ? "bg-sage/10 font-semibold text-sage-dark" : "hover:bg-black/5"}`}
                         aria-current={
                           h.id === ctx.household.id ? "true" : undefined
                         }
@@ -89,33 +91,33 @@ export default async function AppLayout({
                   </li>
                 ))}
               </ul>
-              <div className="flex flex-col border-t border-ink/20 pt-2 text-sm">
+              <div className="flex flex-col border-t border-black/10 pt-2 text-sm">
                 <Link
                   href="/setup?neu=1"
-                  className="rounded-lg px-2 py-1.5 hover:bg-cream-dark"
+                  className="rounded-xl px-2.5 py-2 hover:bg-black/5"
                 >
-                  ➕ Neue WG erstellen
+                  Neue WG erstellen
                 </Link>
                 <Link
                   href="/profil"
-                  className="rounded-lg px-2 py-1.5 hover:bg-cream-dark"
+                  className="rounded-xl px-2.5 py-2 hover:bg-black/5"
                 >
-                  🙂 Profil
+                  Profil
                 </Link>
                 <Link
                   href="/urlaub"
-                  className="rounded-lg px-2 py-1.5 hover:bg-cream-dark"
+                  className="rounded-xl px-2.5 py-2 hover:bg-black/5"
                 >
-                  🧳 Urlaub
+                  Urlaub
                 </Link>
-                <FeedbackLink className="rounded-lg px-2 py-1.5 hover:bg-cream-dark" />
-                <LogoutButton className="rounded-lg px-2 py-1.5 text-left hover:bg-cream-dark" />
+                <FeedbackLink className="rounded-xl px-2.5 py-2 hover:bg-black/5" />
+                <LogoutButton className="rounded-xl px-2.5 py-2 text-left hover:bg-black/5" />
               </div>
             </div>
           </MenuDetails>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-xl flex-1 px-4 pt-4 pb-28">
+      <main className="mx-auto w-full max-w-xl flex-1 px-4 pt-5 pb-32">
         <HouseholdPrompts
           db={ctx.db}
           householdId={ctx.household.id}

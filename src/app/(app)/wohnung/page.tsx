@@ -41,7 +41,7 @@ export default async function ApartmentPage() {
     return (
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold">Wohnung</h1>
-        <div className="rounded-2xl border-2 border-dashed border-ink/40 p-6 text-center">
+        <div className="rounded-2xl border border-dashed border-black/15 p-6 text-center">
           <p className="mb-2 text-4xl">🗺️</p>
           <p className="mb-3 font-semibold">Noch kein Grundriss gezeichnet.</p>
           {ctx.isAdmin ? (
@@ -70,16 +70,16 @@ export default async function ApartmentPage() {
         {canEditPlan && (
           <Link
             href="/plan/bearbeiten"
-            className="rounded-xl border-2 border-ink border-b-4 bg-cream px-3 py-1 text-sm font-semibold"
+            className="rounded-full glass px-3 py-1 text-sm font-semibold"
           >
-            ✏️ Bearbeiten
+            Bearbeiten
           </Link>
         )}
       </div>
       {(unplaced > 0 || undrawn > 0) && (
         <Link
           href="/plan/bearbeiten"
-          className="rounded-xl bg-status-sweet/40 px-3 py-2 text-sm"
+          className="glass rounded-2xl px-3.5 py-2.5 text-sm"
         >
           {[
             undrawn > 0 &&

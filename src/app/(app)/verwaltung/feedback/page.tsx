@@ -40,7 +40,7 @@ export default async function FeedbackAdminPage({
                 s ? `/verwaltung/feedback?status=${s}` : "/verwaltung/feedback"
               }
               aria-current={active ? "page" : undefined}
-              className={`rounded-full border-2 border-ink px-3 py-1 text-sm font-semibold ${active ? "bg-ink text-cream" : "bg-white"}`}
+              className={`rounded-full border border-black/5 px-3.5 py-1.5 text-sm font-medium shadow-[0_1px_2px_rgb(0_0_0/0.04)] ${active ? "bg-ink text-white" : "bg-white"}`}
             >
               {s ? FEEDBACK_STATUS[s as FeedbackStatus] : "Alle"} ({count})
             </Link>
@@ -55,7 +55,7 @@ export default async function FeedbackAdminPage({
             <li key={t.id}>
               <Link
                 href={`/verwaltung/feedback/${t.id}`}
-                className="block rounded-2xl border-2 border-ink bg-white/70 p-3 shadow-[0_3px_0_0_var(--ink)]"
+                className="block rounded-2xl glass p-3"
               >
                 <span className="flex justify-between gap-2 text-xs text-ink/60">
                   <span>

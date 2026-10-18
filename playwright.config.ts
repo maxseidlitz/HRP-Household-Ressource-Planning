@@ -15,6 +15,8 @@ export default defineConfig({
     launchOptions: {
       // Datumsfelder wie auf einem deutschen Handy
       args: ["--lang=de-DE"],
+      // Chromium nimmt das Datumsformat von der Systemsprache
+      env: { ...process.env, LANG: "de_DE.UTF-8" },
       ...(process.env.PW_CHROMIUM_PATH
         ? { executablePath: process.env.PW_CHROMIUM_PATH }
         : {}),

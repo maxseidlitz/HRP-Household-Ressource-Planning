@@ -9,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Haushaltsaufgaben für eure WG",
     start_url: "/",
     display: "standalone",
-    background_color: "#f6efe2",
-    theme_color: "#f6efe2",
+    background_color: "#eef1f7",
+    theme_color: "#eef1f7",
     lang: "de",
     icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
   };

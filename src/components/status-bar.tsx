@@ -31,7 +31,7 @@ export function StatusBar({
   const pulsing = status === "overdue" || status === "filthy";
   return (
     <div
-      className="relative h-3 w-full overflow-hidden rounded-full border-2 border-ink/80 bg-white"
+      className="relative h-2 w-full overflow-hidden rounded-full bg-black/[0.07]"
       role="meter"
       aria-valuemin={0}
       aria-valuemax={150}
@@ -39,21 +39,21 @@ export function StatusBar({
       aria-label={`${STATUS_LABELS[status]}, ${Math.round(progress * 100)} %`}
     >
       <div
-        className="absolute inset-y-0 bg-status-sweet/25"
+        className="absolute inset-y-0 bg-status-sweet/20"
         style={{
           left: pct(early),
           width: `calc(${pct(late)} - ${pct(early)})`,
         }}
       />
       <div
-        className={`absolute inset-y-0 left-0 rounded-r-full ${pulsing ? "animate-overdue" : ""}`}
+        className={`absolute inset-y-0 left-0 rounded-full ${pulsing ? "animate-overdue" : ""}`}
         style={{
           width: pct(Math.max(progress, 0.02)),
-          backgroundColor: status === "paused" ? "#b8b0a2" : color,
+          backgroundColor: status === "paused" ? "#c7c7cc" : color,
         }}
       />
       <div
-        className="absolute inset-y-0 w-0.5 bg-ink/40"
+        className="absolute inset-y-0 w-px bg-black/25"
         style={{ left: pct(late) }}
       />
     </div>

@@ -73,7 +73,7 @@ export const IsoView = forwardRef<
   }));
 
   const btn =
-    "flex size-9 items-center justify-center rounded-lg border-2 border-ink bg-cream text-lg font-bold";
+    "glass flex size-9 items-center justify-center rounded-full text-base font-semibold text-ink/80";
   const rotate = (delta: 1 | 3) => {
     const k = ((rotation + delta) % 4) as ViewRotation;
     setRotation(k);
@@ -130,7 +130,7 @@ export const IsoView = forwardRef<
       <div
         ref={host}
         data-testid="iso"
-        className="-mx-4 overflow-hidden bg-[#f3ead9]"
+        className="-mx-4 overflow-hidden"
         style={{
           height: "min(calc(100dvh - 17rem), 72vw, 560px)",
           minHeight: 300,
