@@ -5,6 +5,7 @@ import type { LeaderboardPeriod } from "@/domain/leaderboard";
 import { formatPoints } from "@/domain/points";
 import { requireHousehold } from "@/server/context";
 import { track } from "@/server/queries/analytics";
+import { awayUserIds } from "@/server/queries/absences";
 import { listMembers } from "@/server/queries/households";
 import { householdLeaderboard } from "@/server/queries/tasks";
 
@@ -25,6 +26,7 @@ export default async function LeaderboardPage({
   const members = new Map(
     listMembers(ctx.db, ctx.household.id).map((m) => [m.userId, m]),
   );
+  const away = awayUserIds(ctx.db, [...members.keys()], now);
   track(ctx.db, {
     name: "screen_view",
     screen: "rangliste",
@@ -95,6 +97,7 @@ export default async function LeaderboardPage({
               />
               <span className="max-w-full truncate text-sm font-bold">
                 {m.name}
+                {away.has(m.userId) && " 🧳"}
               </span>
               <div
                 className={`${height} flex w-full flex-col items-center justify-start rounded-t-xl border-2 border-ink bg-status-sweet/50 pt-1`}
@@ -128,6 +131,7 @@ export default async function LeaderboardPage({
               />
               <span className="flex-1 font-semibold">
                 {m.name}
+                {away.has(m.userId) && <span title="im Urlaub"> 🧳</span>}
                 {me && <span className="text-xs font-normal"> (du)</span>}
               </span>
               <span className="text-xs text-ink/60">{e.completions}×</span>

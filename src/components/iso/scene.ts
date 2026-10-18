@@ -51,12 +51,20 @@ import {
 import { buildWalkGrid, type WalkGrid } from "@/domain/walk";
 import type { Plan, PlanObject, PlanRoom } from "@/server/queries/plan";
 
-export type IsoAvatar = { userId: string; name: string; avatar: AvatarConfig };
+export type IsoAvatar = {
+  userId: string;
+  name: string;
+  avatar: AvatarConfig;
+  /** Im Urlaub: ausgegraut mit Koffer, läuft nicht (Spez. 7). */
+  away?: boolean;
+};
 
 export type IsoData = {
   plan: Plan;
   avatars: IsoAvatar[];
   viewerId: string;
+  /** Wecker-Labels je Objekt, z. B. „Fr · Anna“ (Spez. 12.4). */
+  badges?: Record<string, string>;
 };
 
 export type IsoCallbacks = {
@@ -97,6 +105,7 @@ type AvatarSprite = {
   rng: Rng;
   grid: WalkGrid;
   phase: number;
+  away: boolean;
 };
 
 type ObjectFx = {
@@ -292,6 +301,9 @@ export class IsoScene {
     this.syncAvatars();
     this.fit();
     this.container.dataset.objects = String(placed.length);
+    this.container.dataset.badges = String(
+      Object.keys(this.data.badges ?? {}).length,
+    );
   }
 
   private isAvatarRoot(c: Container) {
@@ -479,6 +491,31 @@ export class IsoScene {
     };
     if (o.status === "filthy") this.addDirt(fx, o.type, { x0, y0, x1, y1 });
     this.objectFx.push(fx);
+    const badge = this.data.badges?.[o.id];
+    if (badge) this.drawBadge(`⏰ ${badge}`, { x: top.x, y: top.y - size });
+  }
+
+  /** Wecker-Schild über eingeplanten Objekten. */
+  private drawBadge(text: string, at: Pt) {
+    const label = new Text({
+      text,
+      style: {
+        fontSize: 10,
+        fontWeight: "700",
+        fill: INK,
+        fontFamily: "ui-rounded, system-ui, sans-serif",
+      },
+    });
+    label.anchor.set(0.5);
+    const plate = new Graphics()
+      .roundRect(-label.width / 2 - 5, -8, label.width + 10, 16, 8)
+      .fill({ color: 0xffffff })
+      .stroke({ width: 1.5, color: INK });
+    const tag = new Container();
+    tag.addChild(plate, label);
+    tag.position.set(at.x, at.y);
+    tag.label = "badge";
+    this.labelLayer.addChild(tag);
   }
 
   /** Schmutz-Effekte ab 150 % (Spez. 12.4). */
@@ -585,6 +622,7 @@ export class IsoScene {
       const grid = this.gridFor(info.userId);
       const existing = this.avatars.get(info.userId);
       if (existing) {
+        this.applyAway(existing, Boolean(info.away));
         existing.grid = grid;
         existing.state = this.revalidate(existing, grid);
         this.entityLayer.addChild(existing.root);
@@ -594,6 +632,7 @@ export class IsoScene {
       const rng = seededRng(hash(info.userId) + seed);
       const start = this.startTile(info.userId, grid, rng);
       const sprite = this.makeAvatar(info, initialAvatar(start), rng, grid);
+      this.applyAway(sprite, Boolean(info.away));
       this.avatars.set(info.userId, sprite);
       this.entityLayer.addChild(sprite.root);
     }
@@ -621,6 +660,16 @@ export class IsoScene {
       : undefined;
     if (target) return sendToClean({ ...s, path: [] }, grid, target);
     return { ...s, path: [], mode: "idle", timer: 0.3, next: null };
+  }
+
+  private applyAway(a: AvatarSprite, away: boolean) {
+    a.away = away;
+    a.root.alpha = away ? 0.5 : 1;
+    a.root.label = `avatar:${a.userId}${away ? ":away" : ""}`;
+    if (!away && a.bubbleText.text === "🧳") {
+      a.bubbleText.text = "";
+      a.bubble.visible = false;
+    }
   }
 
   /** Eigene Leute starten gern im eigenen Zimmer, sonst irgendwo. */
@@ -724,6 +773,7 @@ export class IsoScene {
       rng,
       grid,
       phase: rng() * 10,
+      away: false,
     };
   }
 
@@ -732,7 +782,7 @@ export class IsoScene {
     const fx = this.objectFx.find((f) => f.objectId === objectId);
     const me = this.avatars.get(this.data.viewerId);
     const target = this.interactables.find((i) => i.id === objectId);
-    if (me && target) {
+    if (me && target && !me.away) {
       me.state = sendToClean(me.state, me.grid, target);
       this.pendingLabels.set(objectId, label);
     } else if (fx) {
@@ -811,6 +861,18 @@ export class IsoScene {
         .map((r) => r.id),
     );
     for (const a of this.avatars.values()) {
+      if (a.away) {
+        // Im Urlaub: steht still mit Koffer.
+        const [rx, ry] = rotatePoint(a.state.x, a.state.y, this.rotation);
+        const p = project(rx, ry);
+        a.root.position.set(p.x, p.y);
+        a.root.zIndex = rx + ry - 0.5;
+        a.body.y = 0;
+        a.body.rotation = 0;
+        a.bubble.visible = true;
+        if (a.bubbleText.text !== "🧳") a.bubbleText.text = "🧳";
+        continue;
+      }
       const r = stepAvatar(a.state, dt, a.grid, this.interactables, a.rng);
       a.state = r.state;
       if (r.event?.kind === "cleaned") {

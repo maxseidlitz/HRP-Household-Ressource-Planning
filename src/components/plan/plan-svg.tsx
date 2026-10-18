@@ -217,11 +217,14 @@ export function ObjectShape({
   selected = false,
   ghost = false,
   onSelect,
+  badge,
 }: {
   object: PlanObject;
   selected?: boolean;
   ghost?: boolean;
   onSelect?: (id: string) => void;
+  /** Wecker-Label einer Einplanung, z. B. „Fr · A“. */
+  badge?: string;
 }) {
   const { w, h } = rotatedSize(o);
   const x = o.x * TILE;
@@ -304,6 +307,23 @@ export function ObjectShape({
           🪰
         </text>
       )}
+      {badge && (
+        <g style={{ pointerEvents: "none" }} data-testid="plan-badge">
+          <rect
+            x={x - 4}
+            y={y - 9}
+            width={badge.length * 4.6 + 14}
+            height={13}
+            rx={6.5}
+            fill="#fff"
+            stroke={INK}
+            strokeWidth={1}
+          />
+          <text x={x + 2} y={y + 1} fontSize={8.5} fontWeight={700} fill={INK}>
+            ⏰ {badge}
+          </text>
+        </g>
+      )}
       {selected && (
         <rect
           x={x}
@@ -365,6 +385,7 @@ export function PlanSvg({
   selectedObjectId,
   onSelectObject,
   onSelectFloor,
+  badges,
   className,
   svgRef,
   children,
@@ -378,6 +399,8 @@ export function PlanSvg({
   selectedObjectId?: string | null;
   onSelectObject?: (id: string) => void;
   onSelectFloor?: (objectId: string) => void;
+  /** Wecker-Labels je Objekt (Spez. 12.4). */
+  badges?: Record<string, string>;
   className?: string;
   svgRef?: React.Ref<SVGSVGElement>;
   children?: ReactNode;
@@ -415,6 +438,7 @@ export function PlanSvg({
             object={o}
             selected={selectedObjectId === o.id}
             onSelect={onSelectObject}
+            badge={badges?.[o.id]}
           />
         ))}
       {children}

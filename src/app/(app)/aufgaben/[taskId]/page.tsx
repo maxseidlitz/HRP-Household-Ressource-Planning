@@ -3,13 +3,22 @@ import { notFound } from "next/navigation";
 import { parseAvatar } from "@/catalog/avatar";
 import { objectEmoji } from "@/catalog/objects";
 import { Avatar } from "@/components/avatar";
+import { commitmentLabel } from "@/components/commitment-badge";
+import { CommitmentForm } from "@/components/commitment-form";
 import { CompleteButton } from "@/components/complete-button";
 import { STATUS_LABELS, StatusBar } from "@/components/status-bar";
 import { TaskEditForm } from "@/components/task-edit-form";
 import { dueLabel } from "@/components/task-row";
 import { Button, Card } from "@/components/ui";
 import { formatPoints } from "@/domain/points";
-import { formatDateTime } from "@/domain/time";
+import {
+  atLocalHour,
+  formatDateTime,
+  suggestPlannedFor,
+  toLocalInputValue,
+  zonedStartOfNextDay,
+} from "@/domain/time";
+import { cancelCommitmentAction } from "@/server/actions/planning";
 import { deleteTaskAction, setTaskActiveAction } from "@/server/actions/rooms";
 import { requireHousehold } from "@/server/context";
 import { getTaskView, taskHistory } from "@/server/queries/tasks";
@@ -31,6 +40,9 @@ export default async function TaskPage({
   const canEdit = t.isPrivate || ctx.isAdmin;
   const tz = ctx.household.timezone;
   const { earlyThreshold, lateThreshold } = ctx.household.settings;
+  const c = t.commitment;
+  const mine = c?.userId === ctx.user.id;
+  const canPlan = t.active && !t.isPrivate && (!c || mine);
 
   return (
     <div className="flex flex-col gap-4">
@@ -83,6 +95,65 @@ export default async function TaskPage({
           </p>
         )}
       </Card>
+
+      {t.active && !t.isPrivate && (
+        <Card className="flex flex-col gap-3">
+          <h2 id="einplanen" className="font-bold">
+            Einplanen
+          </h2>
+          {c && (
+            <div
+              className="flex items-center gap-3 rounded-xl bg-white/70 px-3 py-2"
+              data-testid="commitment"
+            >
+              <span aria-hidden className="text-2xl">
+                ⏰
+              </span>
+              <span className="flex-1 text-sm">
+                <strong>{mine ? "Du" : c.userName}</strong>{" "}
+                {mine ? "hast" : "hat"} das eingeplant für{" "}
+                <strong>{formatDateTime(c.plannedFor, tz)}</strong>
+                <span className="sr-only"> ({commitmentLabel(c, tz)})</span>
+              </span>
+            </div>
+          )}
+          {mine && c && (
+            <div className="flex gap-2">
+              <a
+                href={`/api/ics/${c.id}`}
+                className="flex-1 rounded-xl border-2 border-b-4 border-ink bg-white px-3 py-2 text-center text-sm font-semibold"
+                download
+              >
+                📅 In den Kalender
+              </a>
+              <form action={cancelCommitmentAction}>
+                <input type="hidden" name="commitmentId" value={c.id} />
+                <Button variant="secondary" className="text-sm">
+                  Absagen
+                </Button>
+              </form>
+            </div>
+          )}
+          {canPlan ? (
+            <CommitmentForm
+              key={c?.plannedFor.toISOString() ?? "neu"}
+              taskId={t.id}
+              replan={Boolean(c)}
+              min={toLocalInputValue(now, tz)}
+              suggestion={toLocalInputValue(
+                c?.plannedFor ?? suggestPlannedFor(now, t.dueAt, tz),
+                tz,
+              )}
+              quick={quickPicks(now, tz)}
+            />
+          ) : (
+            <p className="text-xs text-ink/70">
+              Erledigen darf trotzdem jede:r, dann gilt die Einplanung als
+              erfüllt.
+            </p>
+          )}
+        </Card>
+      )}
 
       <section aria-labelledby="historie">
         <h2 id="historie" className="mb-2 font-bold">
@@ -153,4 +224,35 @@ export default async function TaskPage({
       )}
     </div>
   );
+}
+
+/** Schnellwahl: heute Abend, morgen Abend, Samstag Vormittag. */
+function quickPicks(now: Date, tz: string) {
+  const picks: { label: string; value: string }[] = [];
+  const soon = now.getTime() + 3_600_000;
+  const tonight = atLocalHour(now, 18, tz);
+  if (tonight.getTime() > soon)
+    picks.push({
+      label: "Heute 18 Uhr",
+      value: toLocalInputValue(tonight, tz),
+    });
+  const tomorrow = zonedStartOfNextDay(now, tz);
+  picks.push({
+    label: "Morgen 18 Uhr",
+    value: toLocalInputValue(atLocalHour(tomorrow, 18, tz), tz),
+  });
+  let day = tomorrow;
+  for (let i = 0; i < 7; i++) {
+    const weekday = new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      timeZone: tz,
+    }).format(day);
+    if (weekday === "Sat") break;
+    day = zonedStartOfNextDay(day, tz);
+  }
+  picks.push({
+    label: "Samstag 11 Uhr",
+    value: toLocalInputValue(atLocalHour(day, 11, tz), tz),
+  });
+  return picks;
 }

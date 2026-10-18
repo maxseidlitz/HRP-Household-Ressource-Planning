@@ -4,6 +4,7 @@ import { PlanViewer } from "@/components/plan/plan-viewer";
 import { listMembers } from "@/server/queries/households";
 import { requireHousehold } from "@/server/context";
 import { track } from "@/server/queries/analytics";
+import { awayUserIds } from "@/server/queries/absences";
 import { getPlan } from "@/server/queries/plan";
 
 export default async function ApartmentPage() {
@@ -20,6 +21,12 @@ export default async function ApartmentPage() {
     householdId: ctx.household.id,
     userId: ctx.user.id,
   });
+  const members = listMembers(ctx.db, ctx.household.id);
+  const away = awayUserIds(
+    ctx.db,
+    members.map((m) => m.userId),
+    now,
+  );
   const drawn = plan.rooms.some((r) => r.tiles.length > 0);
   const canEditPlan = plan.rooms.some((r) => r.canEditOutline) || ctx.isAdmin;
   const unplaced = plan.objects.filter(
@@ -89,10 +96,12 @@ export default async function ApartmentPage() {
         plan={plan}
         nowIso={now.toISOString()}
         viewerId={ctx.user.id}
-        avatars={listMembers(ctx.db, ctx.household.id).map((m) => ({
+        timeZone={ctx.household.timezone}
+        avatars={members.map((m) => ({
           userId: m.userId,
           name: m.name,
           avatar: parseAvatar(m.avatarJson, m.userId),
+          away: away.has(m.userId),
         }))}
       />
     </div>

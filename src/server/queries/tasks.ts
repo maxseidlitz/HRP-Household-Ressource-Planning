@@ -27,6 +27,7 @@ import {
 } from "@/domain/progress";
 import { parseSettings, resolveThresholds } from "@/domain/settings";
 import { assert } from "../errors";
+import { vacationScores } from "./absences";
 import { visibleTo } from "./rooms";
 
 export type TaskView = {
@@ -49,7 +50,41 @@ export type TaskView = {
   color: string;
   /** Punkte, wenn die Aufgabe jetzt erledigt wird. */
   pointsNow: number;
+  /** Offene Einplanung („Ich mach das“), Spez. 5.6. */
+  commitment: OpenCommitment | null;
 };
+
+export type OpenCommitment = {
+  id: string;
+  taskId: string;
+  userId: string;
+  userName: string;
+  avatarJson: string | null;
+  plannedFor: Date;
+};
+
+export function openCommitmentsFor(
+  db: DB,
+  taskIds: string[],
+): Map<string, OpenCommitment> {
+  if (taskIds.length === 0) return new Map();
+  const rows = db
+    .select({
+      id: commitment.id,
+      taskId: commitment.taskId,
+      userId: commitment.userId,
+      plannedFor: commitment.plannedFor,
+      userName: user.name,
+      avatarJson: user.avatarJson,
+    })
+    .from(commitment)
+    .innerJoin(user, eq(user.id, commitment.userId))
+    .where(
+      and(inArray(commitment.taskId, taskIds), eq(commitment.status, "open")),
+    )
+    .all();
+  return new Map(rows.map((r) => [r.taskId, r]));
+}
 
 /**
  * Alle für die Person sichtbaren Aufgaben der WG inkl. berechnetem Status
@@ -100,6 +135,11 @@ export function listTaskViews(
       .map((r) => [r.taskId, r.at]),
   );
 
+  const commitments = openCommitmentsFor(
+    db,
+    rows.map((r) => r.task.id),
+  );
+
   return rows
     .map(({ task: t, object: o, room: r }) => {
       const last = lastDone.get(t.id) ?? null;
@@ -128,6 +168,7 @@ export function listTaskViews(
         pointsNow: r.privateOwnerId
           ? 0
           : pointsFor(p, t.multiplier, thresholds),
+        commitment: commitments.get(t.id) ?? null,
       } satisfies TaskView;
     })
     .sort(
@@ -287,5 +328,10 @@ export function householdLeaderboard(
     )
     .all();
 
-  return leaderboard(members, completions, since);
+  // Urlaubspaket-Punkte zählen wie Erledigungen (Spez. 7).
+  return leaderboard(
+    members,
+    [...completions, ...vacationScores(db, input.householdId)],
+    since,
+  );
 }

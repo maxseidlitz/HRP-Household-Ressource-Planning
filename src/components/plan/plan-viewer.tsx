@@ -5,7 +5,9 @@ import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { objectEmoji } from "@/catalog/objects";
 import { IsoView, type IsoViewHandle } from "@/components/iso/iso-view";
 import type { IsoAvatar } from "@/components/iso/scene";
+import { commitmentLabel } from "@/components/commitment-badge";
 import { TaskRow } from "@/components/task-row";
+import { weekdayShort } from "@/domain/time";
 import { formatPoints } from "@/domain/points";
 import type { Plan } from "@/server/queries/plan";
 import type { CompleteResult } from "@/server/queries/tasks";
@@ -37,11 +39,13 @@ export function PlanViewer({
   nowIso,
   avatars,
   viewerId,
+  timeZone,
 }: {
   plan: Plan;
   nowIso: string;
   avatars: IsoAvatar[];
   viewerId: string;
+  timeZone: string;
 }) {
   const now = useMemo(() => new Date(nowIso), [nowIso]);
   const z = useZoom(1);
@@ -54,9 +58,23 @@ export function PlanViewer({
   const [override, setOverride] = useState<ViewMode | null>(null);
   const mode = override ?? stored;
   const [isoAvailable, setIsoAvailable] = useState(true);
+  // Wecker-Icon für eingeplante Aufgaben (Spez. 12.4): kurz im 2D-Plan,
+  // ausführlich im Diorama.
+  const { badges, isoBadges } = useMemo(() => {
+    const short: Record<string, string> = {};
+    const long: Record<string, string> = {};
+    for (const t of plan.tasks) {
+      const c = t.commitment;
+      if (!c || short[t.objectId]) continue;
+      short[t.objectId] =
+        `${weekdayShort(new Date(c.plannedFor), timeZone)} · ${c.userName.slice(0, 1)}`;
+      long[t.objectId] = commitmentLabel(c, timeZone);
+    }
+    return { badges: short, isoBadges: long };
+  }, [plan.tasks, timeZone]);
   const isoData = useMemo(
-    () => ({ plan, avatars, viewerId }),
-    [plan, avatars, viewerId],
+    () => ({ plan, avatars, viewerId, badges: isoBadges }),
+    [plan, avatars, viewerId, isoBadges],
   );
 
   function switchMode(m: ViewMode) {
@@ -158,6 +176,7 @@ export function PlanViewer({
               selectedObjectId={selected}
               onSelectObject={setSelected}
               onSelectFloor={setSelected}
+              badges={badges}
               className="block h-auto"
               style={{
                 width: `${z.zoom * 100}%`,
@@ -222,6 +241,7 @@ export function PlanViewer({
                   key={t.id}
                   task={t}
                   now={now}
+                  timeZone={timeZone}
                   onCompleted={(r) => onCompleted(t.objectId, r)}
                 />
               ))}
@@ -264,6 +284,7 @@ export function PlanViewer({
                     key={t.id}
                     task={t}
                     now={now}
+                    timeZone={timeZone}
                     onCompleted={(r) => onCompleted(t.objectId, r)}
                   />
                 ))}

@@ -1,8 +1,9 @@
 # 🏠 HRP – Household Ressource Planning
 
 Die Haushalts-App für eure WG: Aufgaben mit rollierender Fälligkeit, Punkte für
-Fairness und – bald – ein isometrischer Wohnungsplan, in dem sich Klo, Herd und
-Mülleimer von grün nach rot verfärben. Selbst gehostet, läuft im Heimnetz.
+Fairness und ein isometrischer Wohnungsplan, in dem sich Klo, Herd und
+Mülleimer von grün nach rot verfärben. Einplanen mit Kalender-Erinnerung,
+Mitteilungen und Urlaubsmodus inklusive. Selbst gehostet, läuft im Heimnetz.
 
 ## 🚀 Schnellstart
 
@@ -49,11 +50,15 @@ braucht es nicht.
 | :---------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
 | <img src="docs/screenshots/05-aufgabe.png" width="240" alt="Aufgabendetail mit Historie"> | <img src="docs/screenshots/06-rangliste.png" width="240" alt="Rangliste mit Podest"> | <img src="docs/screenshots/07-einladen.png" width="240" alt="Einladungslink mit QR-Code"> |
 
+|                                            Einplanen mit Kalender-Export                                            |                                                   Mitteilungen                                                   |                                           Urlaub & Urlaubspaket                                           |
+| :-----------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/13-einplanen.png" width="240" alt="Aufgabe einplanen mit Schnellwahl und .ics-Download"> | <img src="docs/screenshots/14-mitteilungen.png" width="240" alt="Mitteilungszentrale mit ungelesenen Meldungen"> | <img src="docs/screenshots/15-urlaub.png" width="240" alt="Geplanter Urlaub mit abhakbarem Urlaubspaket"> |
+
 |                                           Raum einrichten                                            |                              Profil & Avatar                               |                                  WG erstellen                                   |
 | :--------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
 | <img src="docs/screenshots/03-raum.png" width="240" alt="Objekt mit Aufgabenvorschlägen hinzufügen"> | <img src="docs/screenshots/08-profil.png" width="240" alt="Avatar-Editor"> | <img src="docs/screenshots/02-wg-erstellen.png" width="240" alt="WG erstellen"> |
 
-> Stand: Phase 2. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
+> Stand: Phase 3. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
 > (`npm run screenshots`).
 
 ## ✨ Funktionen
@@ -67,7 +72,7 @@ braucht es nicht.
 | 🔒  | Private Zimmer, mehrere Admins mit Ersteller-Schutz, Passwort-Reset-Link, tägliches Backup                                                         | ✅ Phase 1a |
 | 🗺️  | Wohnungsplan mit Statusfarben, Raum-Editor auf dem Raster (L-Formen, Türen, Möbel, Einbauküche, Unterräume)                                        | ✅ Phase 1b |
 | 🎮  | Isometrisches Diorama (PixiJS): Voxel-Möbel in Statusfarben, Fliegen & Gerüche, Avatare mit Wegfindung, Putz-Animation, Drehen/Zoomen, 2D-Fallback | ✅ Phase 2  |
-| ⏰  | Einplanen, Kalender-Export (.ics), Mitteilungen, Urlaub (inkl. Koffer-Avatar)                                                                      | Phase 3     |
+| ⏰  | Einplanen mit Wecker-Icon, Kalender-Export (.ics mit Erinnerung), Mitteilungen mit Badge, Urlaub mit Urlaubspaket und Koffer-Avatar                | ✅ Phase 3  |
 | 📊  | Admin-Statistiken, Feedback-Tickets, Widerspruch per Abstimmung                                                                                    | Phase 4     |
 | 🔔  | HTTPS, PWA-Installation, Push-Benachrichtigungen                                                                                                   | Phase 5     |
 
@@ -88,6 +93,12 @@ Ohne Konfiguration lauffähig. Optional per Umgebungsvariable:
 
 **Backups:** Die App legt täglich eine Kopie der Datenbank unter `backups/` im
 Datenordner an und behält 14 Tage.
+
+**Mitteilungen:** Die App prüft alle fünf Minuten, ob Eingeplantes heute
+ansteht, verpasst wurde oder überfällig ist (Sammelmeldung ab 9 Uhr), und
+die Glocke aktualisiert sich alle 30 Sekunden. Push-Benachrichtigungen kommen
+mit HTTPS in Phase 5; bis dahin erinnert der Kalendereintrag (.ics) zwei
+Stunden vorher.
 
 ### Fertiges Image statt selbst bauen
 

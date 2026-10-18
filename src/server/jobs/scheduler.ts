@@ -1,22 +1,29 @@
 import { getDb } from "@/db";
 import { env } from "@/lib/env";
 import { runDailyBackup } from "./backup";
+import { runNotificationJobs } from "./notifications";
 
-const HOUR = 60 * 60 * 1000;
+const MINUTES = 60 * 1000;
 
 /**
- * In-Process-Scheduler (Spez. 10). Ein Container, ein Prozess: ein einfacher
- * Stundentakt genügt. Weitere Jobs (Mitteilungen) folgen in Phase 3.
+ * In-Process-Scheduler (Spez. 10). Ein Container, ein Prozess: alle fünf
+ * Minuten Mitteilungen prüfen, einmal täglich ein Backup anlegen.
  */
 export function startScheduler() {
   const tick = () => {
+    const db = getDb();
     try {
-      const r = runDailyBackup(getDb(), env.DATA_DIR);
+      runNotificationJobs(db, new Date());
+    } catch (e) {
+      console.error("[mitteilungen] fehlgeschlagen", e);
+    }
+    try {
+      const r = runDailyBackup(db, env.DATA_DIR);
       if (r.created) console.log(`[backup] ${r.file}`);
     } catch (e) {
       console.error("[backup] fehlgeschlagen", e);
     }
   };
-  setTimeout(tick, 60_000).unref();
-  setInterval(tick, HOUR).unref();
+  setTimeout(tick, 20_000).unref();
+  setInterval(tick, 5 * MINUTES).unref();
 }

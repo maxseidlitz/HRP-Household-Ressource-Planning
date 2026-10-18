@@ -12,14 +12,23 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "retain-on-failure",
-    launchOptions: process.env.PW_CHROMIUM_PATH
-      ? { executablePath: process.env.PW_CHROMIUM_PATH }
-      : {},
+    launchOptions: {
+      // Datumsfelder wie auf einem deutschen Handy
+      args: ["--lang=de-DE"],
+      ...(process.env.PW_CHROMIUM_PATH
+        ? { executablePath: process.env.PW_CHROMIUM_PATH }
+        : {}),
+    },
   },
   projects: [
     {
       name: "iphone",
-      use: { ...devices["iPhone 13"], browserName: "chromium" },
+      use: {
+        ...devices["iPhone 13"],
+        browserName: "chromium",
+        locale: "de-DE",
+        timezoneId: "Europe/Berlin",
+      },
     },
   ],
 });

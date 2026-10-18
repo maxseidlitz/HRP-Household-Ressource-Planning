@@ -4,6 +4,7 @@ import type { DB } from "@/db/client";
 import { household, invite, membership, user } from "@/db/schema";
 import { assert, DomainError } from "../errors";
 import { getMembership } from "./households";
+import { notifyHousehold } from "./notifications";
 
 export function newToken(): string {
   return randomBytes(24).toString("base64url");
@@ -136,6 +137,18 @@ export function acceptInvite(
         .set({ uses: sql`${invite.uses} + 1` })
         .where(eq(invite.id, i.id))
         .run();
+      const joined = tx
+        .select({ name: user.name })
+        .from(user)
+        .where(eq(user.id, input.userId))
+        .get();
+      notifyHousehold(tx, {
+        householdId: i.householdId,
+        exceptUserId: input.userId,
+        type: "member_joined",
+        payload: { userName: joined?.name ?? "Jemand" },
+        dedupePrefix: `joined:${i.householdId}:${input.userId}`,
+      });
     }
     tx.update(user)
       .set({ lastHouseholdId: i.householdId })
