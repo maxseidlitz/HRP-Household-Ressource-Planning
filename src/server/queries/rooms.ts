@@ -161,17 +161,66 @@ export function assignRoom(
   });
 }
 
+/**
+ * Räume löschen: Admins löschen Räume im Gemeinschaftsplan, Unterräume
+ * privater Zimmer löscht nur ihre Besitzerin/ihr Besitzer.
+ */
 export function deleteRoom(
   db: DB,
   input: { householdId: string; actorId: string; roomId: string },
 ) {
-  const actor = getMembership(db, input.householdId, input.actorId);
-  assert(actor?.role === "admin", "Nur Admins dürfen Räume löschen.");
-  db.delete(room)
+  const r = db
+    .select()
+    .from(room)
     .where(
       and(eq(room.id, input.roomId), eq(room.householdId, input.householdId)),
     )
-    .run();
+    .get();
+  assert(r, "Raum nicht gefunden.");
+  const actor = getMembership(db, input.householdId, input.actorId);
+  assert(actor, "Du bist kein Mitglied dieser WG.");
+  if (r.parentRoomId) {
+    assert(
+      r.privateOwnerId === input.actorId,
+      "Nur die Person, der das Zimmer gehört, kann Unterräume löschen.",
+    );
+  } else {
+    assert(actor.role === "admin", "Nur Admins dürfen Räume löschen.");
+  }
+  db.delete(room).where(eq(room.id, r.id)).run();
+}
+
+/** Unterraum (z. B. eigenes Bad) im eigenen privaten Zimmer (Spez. 4.2). */
+export function createSubroom(
+  db: DB,
+  input: {
+    householdId: string;
+    viewerId: string;
+    parentRoomId: string;
+    type: RoomType;
+    name: string;
+  },
+) {
+  const parent = getRoomForEdit(db, { ...input, roomId: input.parentRoomId });
+  assert(
+    parent.privateOwnerId === input.viewerId && !parent.parentRoomId,
+    "Unterräume gibt es nur im eigenen privaten Zimmer.",
+  );
+  return db.transaction((tx) => {
+    const [r] = tx
+      .insert(room)
+      .values({
+        householdId: input.householdId,
+        type: input.type,
+        name: input.name,
+        privateOwnerId: input.viewerId,
+        parentRoomId: parent.id,
+      })
+      .returning()
+      .all();
+    insertFloor(tx, r);
+    return r;
+  });
 }
 
 export function listRoomContents(db: DB, roomId: string) {
@@ -222,7 +271,7 @@ export function addObject(
   return o;
 }
 
-function getObjectForEdit(
+export function getObjectForEdit(
   db: DB,
   input: { householdId: string; viewerId: string; objectId: string },
 ) {

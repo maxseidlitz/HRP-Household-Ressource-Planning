@@ -1,0 +1,1 @@
+ALTER TABLE `object` ADD `placed` integer DEFAULT false NOT NULL;

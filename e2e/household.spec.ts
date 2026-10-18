@@ -121,8 +121,9 @@ test("WG anlegen, Aufgabe erledigen, einladen, Rangliste, privates Zimmer, Passw
   await freshPage.getByRole("button", { name: "Passwort speichern" }).click();
   await expect(freshPage.getByText("Passwort geändert")).toBeVisible();
   await login(freshPage, annaUser, "neuesPasswort1");
+  // Startseite ist der Wohnungsplan
   await expect(
-    freshPage.getByRole("heading", { name: "Aufgaben" }),
+    freshPage.getByRole("heading", { name: "Wohnung" }),
   ).toBeVisible();
 
   // Alte Sitzung von Anna ist abgemeldet

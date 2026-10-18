@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
+  { href: "/wohnung", label: "Wohnung", icon: "🏠" },
   { href: "/aufgaben", label: "Aufgaben", icon: "🧽" },
   { href: "/rangliste", label: "Rangliste", icon: "🏆" },
   { href: "/profil", label: "Profil", icon: "🙂" },
@@ -24,7 +25,8 @@ export function TabBar({ isAdmin }: { isAdmin: boolean }) {
           const active =
             pathname === t.href ||
             pathname.startsWith(`${t.href}/`) ||
-            (t.href === "/verwaltung" && pathname.startsWith("/raum/"));
+            (t.href === "/verwaltung" && pathname.startsWith("/raum/")) ||
+            (t.href === "/wohnung" && pathname.startsWith("/plan/"));
           return (
             <li key={t.href} className="flex-1">
               <Link

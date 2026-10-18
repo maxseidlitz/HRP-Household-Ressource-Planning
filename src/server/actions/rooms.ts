@@ -99,7 +99,8 @@ export async function deleteRoomAction(form: FormData) {
     roomId: str(form, "roomId"),
   });
   refresh();
-  redirect("/verwaltung/wohnung");
+  const parentRoomId = str(form, "parentRoomId");
+  redirect(parentRoomId ? `/raum/${parentRoomId}` : "/verwaltung/wohnung");
 }
 
 export async function addObjectAction(
