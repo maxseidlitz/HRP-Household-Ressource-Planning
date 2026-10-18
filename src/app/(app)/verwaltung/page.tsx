@@ -6,7 +6,9 @@ import { listTaskViews } from "@/server/queries/tasks";
 
 export default async function AdminPage() {
   const ctx = await requireAdmin();
-  const rooms = listRooms(ctx.db, ctx.household.id);
+  const rooms = listRooms(ctx.db, ctx.household.id).filter(
+    (r) => !r.parentRoomId,
+  );
   const members = listMembers(ctx.db, ctx.household.id);
   const tasks = listTaskViews(ctx.db, {
     householdId: ctx.household.id,
@@ -18,9 +20,16 @@ export default async function AdminPage() {
     {
       href: "/verwaltung/wohnung",
       icon: "🗺️",
-      title: "Wohnung",
+      title: "Räume & Aufgaben",
       text: `${rooms.length} Räume · ${tasks.length} Aufgaben`,
       done: tasks.length > 0,
+    },
+    {
+      href: "/plan/bearbeiten",
+      icon: "📐",
+      title: "Grundriss",
+      text: `${rooms.filter((r) => r.tilesJson !== "[]").length} von ${rooms.length} Räumen gezeichnet`,
+      done: rooms.length > 0 && rooms.every((r) => r.tilesJson !== "[]"),
     },
     {
       href: "/verwaltung/einladungen",

@@ -43,9 +43,13 @@ export async function createRoom(
   { type, name, owner }: { type: string; name: string; owner?: string },
 ) {
   await page.goto("/verwaltung/wohnung");
-  await page
-    .getByRole("radio", { name: type, exact: true })
-    .check({ force: true });
+  const radio = page.getByRole("radio", { name: type, exact: true });
+  // Das Radio ist visuell versteckt, also das Label anklicken. Vor der
+  // Hydration gesetzte Auswahl kann React zurücksetzen: wiederholen.
+  await expect(async () => {
+    await page.locator("label", { has: radio }).click();
+    await expect(radio).toBeChecked({ timeout: 500 });
+  }).toPass();
   await page.getByLabel("Name", { exact: true }).fill(name);
   if (owner)
     await page
@@ -75,4 +79,61 @@ export async function createInviteLink(page: Page): Promise<string> {
   const field = page.getByRole("textbox", { name: "Einladungslink" }).first();
   await expect(field).toHaveValue(/\/einladung\//);
   return field.inputValue();
+}
+
+/**
+ * Bildschirmkoordinaten eines Punkts im Plan-Editor (in Kacheleinheiten).
+ * Scrollt den Punkt vorher in die Mitte, damit er nicht hinter der festen
+ * Kopf- oder Tab-Leiste liegt.
+ */
+export async function planPoint(
+  page: Page,
+  x: number,
+  y: number,
+  scroll = true,
+) {
+  const svg = page.getByTestId("plan-editor");
+  return svg.evaluate(
+    (el, [px, py, doScroll]) => {
+      const s = el as SVGSVGElement;
+      const tile = Number(s.dataset.tile);
+      const locate = () => {
+        const pt = s.createSVGPoint();
+        pt.x = px * tile;
+        pt.y = py * tile;
+        return pt.matrixTransform(s.getScreenCTM()!);
+      };
+      const box = s.parentElement!;
+      let p = locate();
+      if (!doScroll) return { x: p.x, y: p.y };
+      const b = box.getBoundingClientRect();
+      box.scrollBy(p.x - (b.left + b.width / 2), p.y - (b.top + b.height / 2));
+      p = locate();
+      window.scrollBy(0, p.y - window.innerHeight / 2);
+      p = locate();
+      return { x: p.x, y: p.y };
+    },
+    [x, y, scroll ? 1 : 0] as const,
+  );
+}
+
+/** Rechteck von Kachel a bis Kachel b aufziehen. */
+export async function dragRect(
+  page: Page,
+  a: [number, number],
+  b: [number, number],
+) {
+  await planPoint(page, (a[0] + b[0]) / 2 + 0.5, (a[1] + b[1]) / 2 + 0.5);
+  const p1 = await planPoint(page, a[0] + 0.5, a[1] + 0.5, false);
+  const p2 = await planPoint(page, b[0] + 0.5, b[1] + 0.5, false);
+  await page.mouse.move(p1.x, p1.y);
+  await page.mouse.down();
+  await page.mouse.move((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, { steps: 3 });
+  await page.mouse.move(p2.x, p2.y, { steps: 3 });
+  await page.mouse.up();
+}
+
+export async function clickPlan(page: Page, x: number, y: number) {
+  const p = await planPoint(page, x, y);
+  await page.mouse.click(p.x, p.y);
 }

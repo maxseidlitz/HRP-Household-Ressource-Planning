@@ -38,4 +38,4 @@ for _ in $(seq 1 60); do
   sleep 0.5
 done
 
-E2E_BASE_URL="http://$HOST:$PORT" "$@"
+E2E_DATA_DIR="$DATA_DIR" E2E_BASE_URL="http://$HOST:$PORT" "$@"

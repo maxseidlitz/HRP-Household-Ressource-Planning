@@ -236,6 +236,8 @@ export const householdObject = sqliteTable(
     w: integer("w").notNull().default(1),
     h: integer("h").notNull().default(1),
     rotation: integer("rotation").notNull().default(0),
+    /** Erst platzierte Objekte erscheinen im Wohnungsplan. */
+    placed: integer("placed", { mode: "boolean" }).notNull().default(false),
     /** Implizites Boden-Objekt eines Raums (als Bodentönung gerendert). */
     isFloor: integer("is_floor", { mode: "boolean" }).notNull().default(false),
     createdAt: createdAt(),

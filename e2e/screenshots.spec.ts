@@ -1,16 +1,24 @@
+import path from "node:path";
+import Database from "better-sqlite3";
 import { expect, test, type Page } from "@playwright/test";
-import { addObject, createInviteLink, createRoom, register } from "./helpers";
+import {
+  addObject,
+  clickPlan,
+  createInviteLink,
+  createRoom,
+  dragRect,
+  register,
+} from "./helpers";
 
 // Erzeugt die Screenshots für die README (docs/screenshots).
 // Läuft nur mit `npm run screenshots` gegen eine leere Datenbank.
 test.skip(!process.env.SCREENSHOTS, "nur mit SCREENSHOTS=1");
-test.setTimeout(120_000);
+test.setTimeout(240_000);
 
-const shot = (page: Page, name: string, fullPage = false) =>
+const shot = (page: Page, name: string) =>
   page.screenshot({
     path: `docs/screenshots/${name}.png`,
     animations: "disabled",
-    fullPage,
   });
 
 async function chooseAvatar(page: Page, choices: string[]) {
@@ -19,6 +27,45 @@ async function chooseAvatar(page: Page, choices: string[]) {
     await page.getByRole("button", { name: c, exact: true }).click();
   await page.getByRole("button", { name: "Speichern" }).click();
   await expect(page.getByText("Gespeichert.")).toBeVisible();
+}
+
+/** Setzt den Bezugszeitpunkt einer Aufgabe so, dass sie bei `progress` steht. */
+function backdate(taskName: string, progress: number) {
+  const db = new Database(path.join(process.env.E2E_DATA_DIR!, "hrp.sqlite"));
+  // Nur Aufgaben der Screenshot-WG (erstellt von „max“), falls parallel
+  // andere Tests gleichnamige Aufgaben anlegen.
+  const t = db
+    .prepare(
+      `select task.id, task.interval_days from task
+       join household on household.id = task.household_id
+       join user on user.id = household.created_by_user_id
+       where task.name = ? and user.username = 'max'`,
+    )
+    .get(taskName) as { id: string; interval_days: number } | undefined;
+  if (!t) throw new Error(`Aufgabe ${taskName} fehlt`);
+  const baseline = Date.now() - progress * t.interval_days * 86_400_000;
+  db.prepare("update task set baseline_at = ? where id = ?").run(
+    baseline,
+    t.id,
+  );
+  db.close();
+}
+
+async function selectRoom(page: Page, name: string) {
+  await page
+    .getByRole("navigation", { name: "Raum wählen" })
+    .getByRole("button", { name: new RegExp(name) })
+    .click();
+}
+
+async function placeAt(page: Page, objectName: RegExp, x: number, y: number) {
+  await page
+    .getByRole("region", { name: "Möbel im Raum" })
+    .getByRole("button", { name: objectName })
+    .click();
+  await clickPlan(page, x + 0.5, y + 0.5);
+  await expect(page.getByText("Speichern …")).toHaveCount(0);
+  await expect(page.locator("p[role=alert]")).toHaveCount(0);
 }
 
 test("README-Screenshots", async ({ browser }) => {
@@ -33,26 +80,13 @@ test("README-Screenshots", async ({ browser }) => {
   await max.goto("/registrieren");
   await register(max, { name: "Max", username: "max" });
   await max.getByLabel("Name der WG").fill("WG Sonnenallee");
-  await max.getByRole("radio", { name: "🌻" }).check({ force: true });
+  await max
+    .locator("label", { has: max.getByRole("radio", { name: "🌻" }) })
+    .click();
   await shot(max, "02-wg-erstellen");
   await max.getByLabel("Wie viele wohnen in der WG?").fill("3");
   await max.getByRole("button", { name: "WG erstellen" }).click();
   await expect(max.getByRole("heading", { name: "Wohnung" })).toBeVisible();
-
-  await createRoom(max, { type: "Küche", name: "Küche" });
-  await addObject(max, "dishwasher", "vor ein paar Tagen");
-  await addObject(max, "stove", "vor ein paar Tagen");
-  await addObject(max, "trash_rest", "heute");
-  await addObject(max, "fridge", "heute");
-  await createRoom(max, { type: "Bad", name: "Bad" });
-  await addObject(max, "toilet", "vor ein paar Tagen");
-  await addObject(max, "shower", "heute");
-  await max.getByRole("combobox", { name: "Objekt" }).selectOption("washbasin");
-  await max
-    .getByRole("heading", { name: "Objekt hinzufügen" })
-    .scrollIntoViewIfNeeded();
-  await shot(max, "03-raum");
-
   await chooseAvatar(max, [
     "Hautton 2",
     "Locken",
@@ -64,7 +98,7 @@ test("README-Screenshots", async ({ browser }) => {
 
   const link = await createInviteLink(max);
   await shot(max, "07-einladen");
-
+  const others: Record<string, Page> = {};
   for (const [name, avatar] of [
     ["Anna", ["Hautton 1", "Lang", "Haarfarbe 5", "Oberteil 5", "Nichts"]],
     ["Ben", ["Hautton 4", "Kurz", "Haarfarbe 1", "Oberteil 3", "Kappe"]],
@@ -74,17 +108,139 @@ test("README-Screenshots", async ({ browser }) => {
     await register(p, { name, username: name.toLowerCase() });
     await expect(p.getByRole("heading", { name: "Aufgaben" })).toBeVisible();
     await chooseAvatar(p, [...avatar]);
-    if (name === "Anna") {
-      await p.goto("/aufgaben");
-      await p.getByRole("button", { name: "Klo putzen erledigt" }).click();
-      await expect(p.getByRole("status")).toBeVisible();
-    }
+    others[name] = p;
   }
 
+  // Räume, Objekte, Aufgaben
+  await createRoom(max, { type: "Küche", name: "Küche" });
+  for (const [obj, last] of [
+    ["fridge", "heute"],
+    ["stove", "vor ein paar Tagen"],
+    ["sink", "vor ein paar Tagen"],
+    ["trash_rest", "vor ein paar Tagen"],
+    ["trash_bio", "heute"],
+    ["dining_table", "heute"],
+  ] as const)
+    await addObject(max, obj, last);
+  await createRoom(max, { type: "Bad", name: "Bad" });
+  await addObject(max, "toilet", "vor ein paar Tagen");
+  await addObject(max, "shower", "heute");
+  await max.getByRole("combobox", { name: "Objekt" }).selectOption("washbasin");
+  await max
+    .getByRole("heading", { name: "Objekt hinzufügen" })
+    .evaluate((el) => {
+      window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 90);
+    });
+  await shot(max, "03-raum");
+  await addObject(max, "washbasin", "vor ein paar Tagen");
+  await createRoom(max, { type: "Flur", name: "Flur" });
+  await addObject(max, "shoe_rack", "heute");
+  await createRoom(max, { type: "Wohnzimmer", name: "Wohnzimmer" });
+  await addObject(max, "sofa", "heute");
+  await addObject(max, "plant", "vor ein paar Tagen");
+  await createRoom(max, {
+    type: "Zimmer",
+    name: "Annas Zimmer",
+    owner: "Anna",
+  });
+
+  // Grundriss zeichnen
+  await max.goto("/plan/bearbeiten");
+  const layout: [string, [number, number], [number, number]][] = [
+    ["Küche", [4, 4], [9, 8]],
+    ["Bad", [10, 4], [13, 7]],
+    ["Flur", [4, 9], [13, 10]],
+    ["Wohnzimmer", [4, 11], [9, 15]],
+    ["Annas Zimmer", [10, 11], [13, 15]],
+  ];
+  for (const [name, a, b] of layout) {
+    await selectRoom(max, name);
+    await dragRect(max, a, b);
+    await expect(max.getByText("Speichern …")).toHaveCount(0);
+  }
+  // Türen zum Flur
+  await max.getByRole("tab", { name: "Türen" }).click();
+  for (const [name, x, y] of [
+    ["Küche", 6.5, 8.95],
+    ["Bad", 11.5, 7.95],
+    ["Wohnzimmer", 6.5, 11.05],
+    ["Annas Zimmer", 11.5, 11.05],
+  ] as const) {
+    await selectRoom(max, name);
+    if (name !== "Annas Zimmer")
+      await max.getByRole("tab", { name: "Türen" }).click();
+    await clickPlan(max, x, y);
+    await expect(max.getByText("Speichern …")).toHaveCount(0);
+  }
+
+  // Möbel
+  await selectRoom(max, "Küche");
+  await max.getByRole("tab", { name: "Möbel" }).click();
+  await placeAt(max, /Kühlschrank/, 4, 4);
+  await placeAt(max, /Herd/, 6, 4);
+  await placeAt(max, /Spüle/, 8, 4);
+  await placeAt(max, /Restmüll/, 9, 7);
+  await placeAt(max, /Biomüll/, 8, 7);
+  await placeAt(max, /Esstisch/, 5, 7);
+  for (const n of ["Kühlschrank", "Herd", "Spüle"])
+    await max
+      .getByRole("checkbox", { name: `${n} für Gruppe auswählen` })
+      .check();
+  await max.getByRole("button", { name: "Gruppieren" }).click();
+  await expect(max.getByText(/Einbauküche \(3 Teile\)/)).toBeVisible();
+
+  await selectRoom(max, "Bad");
+  await max.getByRole("tab", { name: "Möbel" }).click();
+  await placeAt(max, /Toilette/, 10, 4);
+  await placeAt(max, /Dusche/, 12, 4);
+  await placeAt(max, /Waschbecken/, 12, 7);
+
+  await selectRoom(max, "Flur");
+  await max.getByRole("tab", { name: "Möbel" }).click();
+  await placeAt(max, /Schuhregal/, 4, 9);
+
+  await selectRoom(max, "Wohnzimmer");
+  await max.getByRole("tab", { name: "Möbel" }).click();
+  await placeAt(max, /Sofa/, 4, 14);
+  await placeAt(max, /Pflanze/, 9, 11);
+  await max
+    .getByRole("region", { name: "Möbel im Raum" })
+    .getByRole("button", { name: /Sofa/ })
+    .click();
+  await max.getByTestId("plan-editor").scrollIntoViewIfNeeded();
+  await shot(max, "09-editor");
+
+  // Ein paar Aufgaben „älter“ machen, damit der Plan Farbe bekommt
+  backdate("Klo putzen", 1.25);
+  backdate("Restmüll rausbringen", 1.7);
+  backdate("Herd reinigen", 0.85);
+  backdate("Gießen", 0.6);
+
+  await others.Anna.goto("/aufgaben");
+  await others.Anna.getByRole("button", {
+    name: "Spüle reinigen erledigt",
+  }).click();
+  await expect(others.Anna.getByRole("status")).toBeVisible();
+  await others.Ben.goto("/aufgaben");
+  await others.Ben.getByRole("button", {
+    name: "Waschbecken + Spiegel erledigt",
+  }).click();
+  await expect(others.Ben.getByRole("status")).toBeVisible();
+
+  await max.goto("/wohnung");
+  await expect(max.getByTestId("plan")).toBeVisible();
+  await shot(max, "00-wohnung");
+
+  await max
+    .getByTestId("plan")
+    .getByRole("button", { name: "Toilette" })
+    .click();
+  await expect(
+    max.getByRole("region", { name: /Aufgaben: Toilette/ }),
+  ).toBeVisible();
+  await shot(max, "10-objekt");
+
   await max.goto("/aufgaben");
-  await max.getByRole("button", { name: "Herd reinigen erledigt" }).click();
-  await expect(max.getByRole("status")).toBeVisible();
-  await max.waitForTimeout(2500);
   await shot(max, "04-aufgaben");
 
   await max.getByRole("link", { name: /Klo putzen/ }).click();

@@ -52,7 +52,7 @@ export async function switchHouseholdAction(form: FormData) {
   const { db, user } = await requireUser();
   switchHousehold(db, user.id, str(form, "householdId"));
   revalidatePath("/", "layout");
-  redirect("/aufgaben");
+  redirect("/wohnung");
 }
 
 export async function updateExpectedMembersAction(

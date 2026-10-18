@@ -14,7 +14,7 @@ import {
 import { requireHousehold } from "@/server/context";
 import { listMembers } from "@/server/queries/households";
 import { canEditRoom, listRoomContents } from "@/server/queries/rooms";
-import { AddObjectForm, AddTasksForm } from "./room-forms";
+import { AddObjectForm, AddTasksForm, SubroomForm } from "./room-forms";
 
 export default async function RoomPage({
   params,
@@ -32,17 +32,28 @@ export default async function RoomPage({
   const owner = members.find((m) => m.userId === r.privateOwnerId);
   const canEdit = canEditRoom(r, ctx.user.id, ctx.isAdmin);
   if (!canEdit && !ctx.isAdmin) notFound();
+  // Unterräume fremder Zimmer existieren für andere nicht (Spez. 4.2).
+  if (!canEdit && r.parentRoomId) notFound();
   const isPrivate = Boolean(r.privateOwnerId);
   // Fremde private Zimmer: auch Admins sehen keinen Inhalt (Spez. 4.2).
   const contents = canEdit ? listRoomContents(ctx.db, r.id) : [];
+  const isOwnTopRoom = r.privateOwnerId === ctx.user.id && !r.parentRoomId;
+  const subrooms = isOwnTopRoom
+    ? ctx.db.select().from(room).where(eq(room.parentRoomId, r.id)).all()
+    : [];
+  const parent = r.parentRoomId
+    ? ctx.db.select().from(room).where(eq(room.id, r.parentRoomId)).get()
+    : undefined;
+  const backHref = parent
+    ? `/raum/${parent.id}`
+    : ctx.isAdmin
+      ? "/verwaltung/wohnung"
+      : "/profil";
 
   return (
     <div className="flex flex-col gap-5">
-      <Link
-        href={ctx.isAdmin ? "/verwaltung/wohnung" : "/profil"}
-        className="text-sm font-semibold text-ink/70"
-      >
-        ← {ctx.isAdmin ? "Wohnung" : "Profil"}
+      <Link href={backHref} className="text-sm font-semibold text-ink/70">
+        ← {parent ? parent.name : ctx.isAdmin ? "Wohnung" : "Profil"}
       </Link>
       <div>
         <h1 className="text-2xl font-bold">
@@ -53,6 +64,12 @@ export default async function RoomPage({
           {ROOM_TYPE_LABELS[r.type]}
           {owner && ` · privat · ${owner.name}`}
         </p>
+        <Link
+          href={`/plan/bearbeiten?raum=${r.id}`}
+          className="mt-2 inline-block text-sm font-semibold underline"
+        >
+          🗺️ Im Plan bearbeiten
+        </Link>
       </div>
 
       {!canEdit ? (
@@ -137,10 +154,48 @@ export default async function RoomPage({
               isPrivate={isPrivate}
             />
           </section>
+          {isOwnTopRoom && (
+            <section className="rounded-2xl border-2 border-ink/40 p-4">
+              <h2 className="mb-1 font-bold">Unterräume</h2>
+              <p className="mb-3 text-xs text-ink/70">
+                Z. B. ein eigenes Bad oder eine Küchenzeile in deinem Zimmer.
+              </p>
+              {subrooms.length > 0 && (
+                <ul className="mb-3 flex flex-col gap-1">
+                  {subrooms.map((s) => (
+                    <li key={s.id}>
+                      <Link
+                        href={`/raum/${s.id}`}
+                        className="flex justify-between rounded-lg bg-cream px-3 py-1.5 text-sm"
+                      >
+                        <span>
+                          {ROOM_TYPE_EMOJI[s.type]} {s.name}
+                        </span>
+                        <span aria-hidden>→</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <SubroomForm parentRoomId={r.id} />
+            </section>
+          )}
+          {r.parentRoomId && (
+            <form action={deleteRoomAction}>
+              <input type="hidden" name="roomId" value={r.id} />
+              <input type="hidden" name="parentRoomId" value={r.parentRoomId} />
+              <Button
+                variant="secondary"
+                className="w-full text-status-overdue"
+              >
+                Unterraum löschen
+              </Button>
+            </form>
+          )}
         </>
       )}
 
-      {ctx.isAdmin && (
+      {ctx.isAdmin && !r.parentRoomId && (
         <details className="rounded-2xl border-2 border-ink/40 p-4">
           <summary className="cursor-pointer font-bold">Raum verwalten</summary>
           <div className="mt-3 flex flex-col gap-3">

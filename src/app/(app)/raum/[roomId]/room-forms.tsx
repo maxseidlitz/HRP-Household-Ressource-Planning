@@ -6,10 +6,11 @@ import {
   suggestionsFor,
   type TaskSuggestion,
 } from "@/catalog/objects";
-import type { RoomType } from "@/catalog/rooms";
+import { ROOM_TYPE_LABELS, type RoomType } from "@/catalog/rooms";
 import { FormMessage } from "@/components/form-state";
 import { TaskPicker } from "@/components/task-picker";
 import { Button, Field } from "@/components/ui";
+import { createSubroomAction } from "@/server/actions/plan";
 import { addObjectAction, addTasksAction } from "@/server/actions/rooms";
 import type { FormState } from "@/server/actions/result";
 
@@ -121,6 +122,44 @@ export function AddTasksForm({
       <FormMessage state={state} success="Aufgaben angelegt." />
       <Button type="submit" variant="secondary" disabled={pending}>
         Aufgaben anlegen
+      </Button>
+    </form>
+  );
+}
+
+export function SubroomForm({ parentRoomId }: { parentRoomId: string }) {
+  const [state, action, pending] = useActionState(createSubroomAction, null);
+  return (
+    <form action={action} className="flex flex-col gap-2">
+      <input type="hidden" name="parentRoomId" value={parentRoomId} />
+      <div className="grid grid-cols-2 gap-2">
+        <label className="flex flex-col gap-1 text-sm font-medium">
+          Typ
+          <select
+            name="type"
+            defaultValue="bath"
+            className="rounded-lg border-2 border-ink/30 bg-white px-2 py-2 text-base font-normal"
+          >
+            {(["bath", "wc", "kitchen", "storage", "other"] as const).map(
+              (t) => (
+                <option key={t} value={t}>
+                  {ROOM_TYPE_LABELS[t]}
+                </option>
+              ),
+            )}
+          </select>
+        </label>
+        <Field
+          label="Name"
+          name="name"
+          defaultValue="Eigenes Bad"
+          required
+          maxLength={40}
+        />
+      </div>
+      <FormMessage state={state} />
+      <Button type="submit" variant="secondary" disabled={pending}>
+        Unterraum anlegen
       </Button>
     </form>
   );
