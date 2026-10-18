@@ -2,7 +2,7 @@ import Link from "next/link";
 import { objectEmoji } from "@/catalog/objects";
 import { formatPoints } from "@/domain/points";
 import { relativeTime } from "@/domain/time";
-import type { TaskView } from "@/server/queries/tasks";
+import type { CompleteResult, TaskView } from "@/server/queries/tasks";
 import { CompleteButton } from "./complete-button";
 import { STATUS_LABELS, StatusBar } from "./status-bar";
 
@@ -13,7 +13,15 @@ export function dueLabel(t: TaskView, now: Date): string {
     : `fällig ${relativeTime(t.dueAt, now)}`;
 }
 
-export function TaskRow({ task: t, now }: { task: TaskView; now: Date }) {
+export function TaskRow({
+  task: t,
+  now,
+  onCompleted,
+}: {
+  task: TaskView;
+  now: Date;
+  onCompleted?: (result: CompleteResult) => void;
+}) {
   return (
     <li className="flex items-center gap-3 rounded-2xl border-2 border-ink bg-white/70 p-3 shadow-[0_3px_0_0_var(--ink)]">
       <span
@@ -46,6 +54,7 @@ export function TaskRow({ task: t, now }: { task: TaskView; now: Date }) {
               taskName={t.name}
               pointsNow={t.pointsNow}
               compact
+              onCompleted={onCompleted}
             />
           </>
         )}

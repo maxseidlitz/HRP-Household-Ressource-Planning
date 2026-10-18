@@ -148,7 +148,7 @@ test("README-Screenshots", async ({ browser }) => {
   await max.goto("/plan/bearbeiten");
   const layout: [string, [number, number], [number, number]][] = [
     ["Küche", [4, 4], [9, 8]],
-    ["Bad", [10, 4], [13, 7]],
+    ["Bad", [10, 4], [13, 8]],
     ["Flur", [4, 9], [13, 10]],
     ["Wohnzimmer", [4, 11], [9, 15]],
     ["Annas Zimmer", [10, 11], [13, 15]],
@@ -162,7 +162,7 @@ test("README-Screenshots", async ({ browser }) => {
   await max.getByRole("tab", { name: "Türen" }).click();
   for (const [name, x, y] of [
     ["Küche", 6.5, 8.95],
-    ["Bad", 11.5, 7.95],
+    ["Bad", 11.5, 8.95],
     ["Wohnzimmer", 6.5, 11.05],
     ["Annas Zimmer", 11.5, 11.05],
   ] as const) {
@@ -193,7 +193,7 @@ test("README-Screenshots", async ({ browser }) => {
   await max.getByRole("tab", { name: "Möbel" }).click();
   await placeAt(max, /Toilette/, 10, 4);
   await placeAt(max, /Dusche/, 12, 4);
-  await placeAt(max, /Waschbecken/, 12, 7);
+  await placeAt(max, /Waschbecken/, 12, 8);
 
   await selectRoom(max, "Flur");
   await max.getByRole("tab", { name: "Möbel" }).click();
@@ -228,17 +228,36 @@ test("README-Screenshots", async ({ browser }) => {
   await expect(others.Ben.getByRole("status")).toBeVisible();
 
   await max.goto("/wohnung");
-  await expect(max.getByTestId("plan")).toBeVisible();
+  const iso = max.getByTestId("iso");
+  await expect(iso).toHaveAttribute("data-ready", "true");
+  await expect(iso).toHaveAttribute("data-avatars", "3");
+  await max.getByRole("button", { name: "Als Nächstes" }).click();
+  await max.waitForTimeout(2500); // Avatare laufen los
   await shot(max, "00-wohnung");
 
+  // Barrierefreie Objektliste (für Screenreader, im Bild unsichtbar)
   await max
-    .getByTestId("plan")
-    .getByRole("button", { name: "Toilette" })
-    .click();
+    .getByRole("button", { name: "Toilette öffnen" })
+    .dispatchEvent("click");
   await expect(
     max.getByRole("region", { name: /Aufgaben: Toilette/ }),
   ).toBeVisible();
   await shot(max, "10-objekt");
+
+  // Erledigen: eigener Avatar läuft hin, putzt, es glitzert
+  const sheet = max.getByRole("region", { name: /Aufgaben: Toilette/ });
+  await sheet.getByRole("button", { name: "Klo putzen erledigt" }).click();
+  await expect(iso).toHaveAttribute("data-last-celebration", /.+/, {
+    timeout: 20_000,
+  });
+  await max.waitForTimeout(150);
+  await shot(max, "12-geputzt");
+  await max.getByRole("button", { name: "Schließen" }).click();
+
+  await max.getByRole("button", { name: "2D", exact: true }).click();
+  await expect(max.getByTestId("plan")).toBeVisible();
+  await shot(max, "11-plan-2d");
+  await max.getByRole("button", { name: "3D", exact: true }).click();
 
   await max.goto("/aufgaben");
   await shot(max, "04-aufgaben");

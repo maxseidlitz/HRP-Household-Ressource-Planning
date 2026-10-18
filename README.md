@@ -37,39 +37,39 @@ braucht es nicht.
 
 ## 📱 So sieht's aus
 
-|                                                            Wohnung                                                             |                                             Objekt antippen                                             |                                            Plan bearbeiten                                            |
-| :----------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------: |
-| <img src="docs/screenshots/00-wohnung.png" width="240" alt="Wohnungsplan mit Statusfarben: Klo und Restmüll rot, Herd orange"> | <img src="docs/screenshots/10-objekt.png" width="240" alt="Bottom-Sheet mit den Aufgaben der Toilette"> | <img src="docs/screenshots/09-editor.png" width="240" alt="Raum-Editor mit Raster, Türen und Möbeln"> |
+|                                             Eure Wohnung als Diorama                                              |                                         Erledigt: Avatar putzt, es glitzert                                         |                                             Objekt antippen                                             |
+| :---------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/00-wohnung.png" width="240" alt="Isometrisches Diorama mit Statusfarben und Avataren"> | <img src="docs/screenshots/12-geputzt.png" width="240" alt="Avatar hat das Klo geputzt, +4,5 Punkte schweben hoch"> | <img src="docs/screenshots/10-objekt.png" width="240" alt="Bottom-Sheet mit den Aufgaben der Toilette"> |
 
-|                                                     Aufgaben                                                     |                                              Aufgabe & Historie                                               |                                      Rangliste                                       |
-| :--------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: |
-| <img src="docs/screenshots/04-aufgaben.png" width="240" alt="Aufgabenliste nach Dringlichkeit mit Statusbalken"> | <img src="docs/screenshots/05-aufgabe.png" width="240" alt="Aufgabendetail mit Erledigt-Button und Historie"> | <img src="docs/screenshots/06-rangliste.png" width="240" alt="Rangliste mit Podest"> |
+|                                          2D-Plan                                          |                                            Plan bearbeiten                                            |                                            Aufgaben                                             |
+| :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/11-plan-2d.png" width="240" alt="Draufsicht mit Statusfarben"> | <img src="docs/screenshots/09-editor.png" width="240" alt="Raum-Editor mit Raster, Türen und Möbeln"> | <img src="docs/screenshots/04-aufgaben.png" width="240" alt="Aufgabenliste nach Dringlichkeit"> |
 
-|                                           Raum einrichten                                            |                                   Einladen per QR-Code                                    |                              Profil & Avatar                               |
-| :--------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: | :------------------------------------------------------------------------: |
-| <img src="docs/screenshots/03-raum.png" width="240" alt="Objekt mit Aufgabenvorschlägen hinzufügen"> | <img src="docs/screenshots/07-einladen.png" width="240" alt="Einladungslink mit QR-Code"> | <img src="docs/screenshots/08-profil.png" width="240" alt="Avatar-Editor"> |
+|                                    Aufgabe & Historie                                     |                                      Rangliste                                       |                                   Einladen per QR-Code                                    |
+| :---------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/05-aufgabe.png" width="240" alt="Aufgabendetail mit Historie"> | <img src="docs/screenshots/06-rangliste.png" width="240" alt="Rangliste mit Podest"> | <img src="docs/screenshots/07-einladen.png" width="240" alt="Einladungslink mit QR-Code"> |
 
-|                             Anmelden                              |                                  WG erstellen                                   |
-| :---------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
-| <img src="docs/screenshots/01-login.png" width="240" alt="Login"> | <img src="docs/screenshots/02-wg-erstellen.png" width="240" alt="WG erstellen"> |
+|                                           Raum einrichten                                            |                              Profil & Avatar                               |                                  WG erstellen                                   |
+| :--------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
+| <img src="docs/screenshots/03-raum.png" width="240" alt="Objekt mit Aufgabenvorschlägen hinzufügen"> | <img src="docs/screenshots/08-profil.png" width="240" alt="Avatar-Editor"> | <img src="docs/screenshots/02-wg-erstellen.png" width="240" alt="WG erstellen"> |
 
-> Stand: Phase 1b. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
+> Stand: Phase 2. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
 > (`npm run screenshots`).
 
 ## ✨ Funktionen
 
-|     | Funktion                                                                                                    | Status      |
-| --- | ----------------------------------------------------------------------------------------------------------- | ----------- |
-| 🔐  | Login mit Benutzername oder E-Mail, funktioniert ohne HTTPS im Heimnetz                                     | ✅ Phase 0  |
-| 🐳  | Docker-Image, ZimaOS-Compose, automatische Migrationen                                                      | ✅ Phase 0  |
-| 🏡  | WG anlegen, mehrere WGs pro Account, Einladung per Link + QR-Code                                           | ✅ Phase 1a |
-| 🧽  | Aufgaben mit Vorschlägen, rollierender Fälligkeit, Punkten und Rangliste                                    | ✅ Phase 1a |
-| 🔒  | Private Zimmer, mehrere Admins mit Ersteller-Schutz, Passwort-Reset-Link, tägliches Backup                  | ✅ Phase 1a |
-| 🗺️  | Wohnungsplan mit Statusfarben, Raum-Editor auf dem Raster (L-Formen, Türen, Möbel, Einbauküche, Unterräume) | ✅ Phase 1b |
-| 🎮  | Isometrisches Diorama mit Avataren und Schmutz-Effekten                                                     | Phase 2     |
-| ⏰  | Einplanen, Kalender-Export (.ics), Mitteilungen, Urlaub                                                     | Phase 3     |
-| 📊  | Admin-Statistiken, Feedback-Tickets, Widerspruch per Abstimmung                                             | Phase 4     |
-| 🔔  | HTTPS, PWA-Installation, Push-Benachrichtigungen                                                            | Phase 5     |
+|     | Funktion                                                                                                                                           | Status      |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| 🔐  | Login mit Benutzername oder E-Mail, funktioniert ohne HTTPS im Heimnetz                                                                            | ✅ Phase 0  |
+| 🐳  | Docker-Image, ZimaOS-Compose, automatische Migrationen                                                                                             | ✅ Phase 0  |
+| 🏡  | WG anlegen, mehrere WGs pro Account, Einladung per Link + QR-Code                                                                                  | ✅ Phase 1a |
+| 🧽  | Aufgaben mit Vorschlägen, rollierender Fälligkeit, Punkten und Rangliste                                                                           | ✅ Phase 1a |
+| 🔒  | Private Zimmer, mehrere Admins mit Ersteller-Schutz, Passwort-Reset-Link, tägliches Backup                                                         | ✅ Phase 1a |
+| 🗺️  | Wohnungsplan mit Statusfarben, Raum-Editor auf dem Raster (L-Formen, Türen, Möbel, Einbauküche, Unterräume)                                        | ✅ Phase 1b |
+| 🎮  | Isometrisches Diorama (PixiJS): Voxel-Möbel in Statusfarben, Fliegen & Gerüche, Avatare mit Wegfindung, Putz-Animation, Drehen/Zoomen, 2D-Fallback | ✅ Phase 2  |
+| ⏰  | Einplanen, Kalender-Export (.ics), Mitteilungen, Urlaub (inkl. Koffer-Avatar)                                                                      | Phase 3     |
+| 📊  | Admin-Statistiken, Feedback-Tickets, Widerspruch per Abstimmung                                                                                    | Phase 4     |
+| 🔔  | HTTPS, PWA-Installation, Push-Benachrichtigungen                                                                                                   | Phase 5     |
 
 Details: [Spezifikation](docs/SPEC.md) · [Umsetzungsplan](docs/PLAN.md)
 

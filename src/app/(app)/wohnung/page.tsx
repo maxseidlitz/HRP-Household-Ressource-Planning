@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { parseAvatar } from "@/catalog/avatar";
 import { PlanViewer } from "@/components/plan/plan-viewer";
+import { listMembers } from "@/server/queries/households";
 import { requireHousehold } from "@/server/context";
 import { track } from "@/server/queries/analytics";
 import { getPlan } from "@/server/queries/plan";
@@ -83,7 +85,16 @@ export default async function ApartmentPage() {
           →
         </Link>
       )}
-      <PlanViewer plan={plan} nowIso={now.toISOString()} />
+      <PlanViewer
+        plan={plan}
+        nowIso={now.toISOString()}
+        viewerId={ctx.user.id}
+        avatars={listMembers(ctx.db, ctx.household.id).map((m) => ({
+          userId: m.userId,
+          name: m.name,
+          avatar: parseAvatar(m.avatarJson, m.userId),
+        }))}
+      />
     </div>
   );
 }

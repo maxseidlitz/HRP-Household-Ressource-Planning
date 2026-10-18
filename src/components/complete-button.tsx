@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { formatPoints } from "@/domain/points";
 import { uuid } from "@/lib/uuid";
 import { completeTaskAction } from "@/server/actions/tasks";
+import type { CompleteResult } from "@/server/queries/tasks";
 
 /**
  * „Erledigt“ mit Punkte-Popup (Spez. 5.5/12.8). Der Idempotenz-Schlüssel
@@ -15,11 +16,14 @@ export function CompleteButton({
   taskName,
   pointsNow,
   compact = false,
+  onCompleted,
 }: {
   taskId: string;
   taskName: string;
   pointsNow: number;
   compact?: boolean;
+  /** Z. B. für die Putz-Animation im Diorama. */
+  onCompleted?: (result: CompleteResult) => void;
 }) {
   const router = useRouter();
   const [key, setKey] = useState(uuid);
@@ -50,6 +54,7 @@ export function CompleteButton({
           text: `+${formatPoints(r.result.points)}`,
         });
       }
+      onCompleted?.(r.result);
       router.refresh();
       setTimeout(() => setFeedback(null), 2200);
     });

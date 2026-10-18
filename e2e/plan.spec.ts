@@ -79,19 +79,39 @@ test("Grundriss zeichnen, Tür setzen, Möbel platzieren, Plan mit Statusfarben"
 
   // Wohnung: Plan mit antippbaren Objekten
   await page.goto("/wohnung");
-  const plan = page.getByTestId("plan");
-  await expect(plan).toBeVisible();
-  await expect(plan.locator("[data-room]")).toHaveCount(2);
-  await expect(plan.locator("[data-door]")).toHaveCount(1);
+  // 3D-Diorama startet mit Objekten und dem eigenen Avatar
+  const iso = page.getByTestId("iso");
+  await expect(iso).toHaveAttribute("data-ready", "true");
+  await expect(iso).toHaveAttribute("data-objects", "2");
+  await expect(iso).toHaveAttribute("data-avatars", "1");
   await expect(
     page.getByRole("region", { name: "Als Nächstes" }),
   ).toBeVisible();
-  await plan.getByRole("button", { name: "Kühlschrank" }).click();
+
+  // Objekt über die barrierefreie Liste öffnen und erledigen: Der Avatar läuft
+  // hin, putzt, danach glitzert es.
+  await page
+    .getByRole("button", { name: "Kühlschrank öffnen" })
+    .dispatchEvent("click");
   const sheet = page.getByRole("region", { name: /Aufgaben: Kühlschrank/ });
   await expect(sheet.getByText("Kühlschrank auswischen")).toBeVisible();
   await sheet
     .getByRole("button", { name: "Kühlschrank auswischen erledigt" })
     .click();
+  await expect(iso).toHaveAttribute("data-last-celebration", /.+/, {
+    timeout: 20_000,
+  });
+
+  // 2D-Ansicht
+  await page.getByRole("button", { name: "2D", exact: true }).click();
+  const plan = page.getByTestId("plan");
+  await expect(plan).toBeVisible();
+  await expect(plan.locator("[data-room]")).toHaveCount(2);
+  await expect(plan.locator("[data-door]")).toHaveCount(1);
+  await plan.getByRole("button", { name: "Herd" }).click();
+  await expect(
+    page.getByRole("region", { name: /Aufgaben: Herd/ }),
+  ).toBeVisible();
   await expect(page.getByTestId("my-points")).toContainText("6");
 });
 
@@ -127,12 +147,14 @@ test("Fremde private Zimmer erscheinen nur als Umriss", async ({ browser }) => {
   await anna.getByRole("button", { name: /Pflanze/ }).click();
   await clickPlan(anna, 5.5, 5.5);
   await anna.goto("/wohnung");
+  await anna.getByRole("button", { name: "2D", exact: true }).click();
   await expect(
     anna.getByTestId("plan").getByRole("button", { name: "Pflanze" }),
   ).toBeVisible();
 
   // Max sieht nur den Umriss mit Schloss
   await admin.goto("/wohnung");
+  await admin.getByRole("button", { name: "2D", exact: true }).click();
   const plan = admin.getByTestId("plan");
   await expect(plan.getByText("🔒 Anna")).toBeVisible();
   await expect(plan.locator("[data-object]")).toHaveCount(0);
