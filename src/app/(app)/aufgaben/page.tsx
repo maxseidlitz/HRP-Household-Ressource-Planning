@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ROOM_TYPE_EMOJI } from "@/catalog/rooms";
 import { TaskRow } from "@/components/task-row";
 import { requireHousehold } from "@/server/context";
+import { bundlesFor } from "@/server/queries/absences";
 import { track } from "@/server/queries/analytics";
 import { listTaskViews } from "@/server/queries/tasks";
 
@@ -23,6 +24,18 @@ export default async function TasksPage({
     userId: ctx.user.id,
   });
 
+  // Offenes Urlaubspaket in den nächsten 7 Tagen (Spez. 7).
+  const soonBundle = bundlesFor(ctx.db, {
+    userId: ctx.user.id,
+    householdId: ctx.household.id,
+    now,
+  }).find(
+    ({ bundle: b, absence: a }) =>
+      a.from > now &&
+      a.from.getTime() - now.getTime() < 7 * 86_400_000 &&
+      (!b.fridgeDoneAt || !b.vacuumTrashDoneAt),
+  );
+
   const rooms = [
     ...new Map(
       all.map((t) => [
@@ -42,6 +55,21 @@ export default async function TasksPage({
         <p className="rounded-xl border-2 border-ink bg-status-sweet/40 p-3 text-sm font-medium">
           Willkommen in {ctx.household.name}! 🎉
         </p>
+      )}
+      {soonBundle && (
+        <Link
+          href="/urlaub"
+          className="flex items-center gap-3 rounded-xl border-2 border-ink bg-status-sweet/40 p-3 text-sm font-medium"
+          data-testid="vacation-banner"
+        >
+          <span aria-hidden className="text-2xl">
+            🧳
+          </span>
+          <span className="flex-1">
+            Bald im Urlaub? Dein Urlaubspaket wartet: bis zu 5 Punkte.
+          </span>
+          <span aria-hidden>→</span>
+        </Link>
       )}
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-bold">Aufgaben</h1>
@@ -101,7 +129,12 @@ export default async function TasksPage({
           aria-label="Aufgaben nach Dringlichkeit"
         >
           {tasks.map((t) => (
-            <TaskRow key={t.id} task={t} now={now} />
+            <TaskRow
+              key={t.id}
+              task={t}
+              now={now}
+              timeZone={ctx.household.timezone}
+            />
           ))}
         </ul>
       )}

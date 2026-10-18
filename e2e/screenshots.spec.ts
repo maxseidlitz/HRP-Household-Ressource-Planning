@@ -51,6 +51,36 @@ function backdate(taskName: string, progress: number) {
   db.close();
 }
 
+/** Mitteilungen für den Screenshot (sonst erst nach dem Scheduler-Lauf). */
+function addNotifications(
+  username: string,
+  items: { type: string; payload: object; minutesAgo: number }[],
+) {
+  const db = new Database(path.join(process.env.E2E_DATA_DIR!, "hrp.sqlite"));
+  const u = db
+    .prepare("select id, last_household_id as hid from user where username = ?")
+    .get(username) as { id: string; hid: string };
+  const insert = db.prepare(
+    `insert into notification (id, user_id, household_id, type, payload_json, created_at)
+     values (?, ?, ?, ?, ?, ?)`,
+  );
+  for (const n of items)
+    insert.run(
+      crypto.randomUUID(),
+      u.id,
+      u.hid,
+      n.type,
+      JSON.stringify(n.payload),
+      Date.now() - n.minutesAgo * 60_000,
+    );
+  db.close();
+}
+
+const day = (offset: number) =>
+  new Date(Date.now() + offset * 86_400_000).toLocaleDateString("sv-SE", {
+    timeZone: "Europe/Berlin",
+  });
+
 async function selectRoom(page: Page, name: string) {
   await page
     .getByRole("navigation", { name: "Raum wählen" })
@@ -227,10 +257,24 @@ test("README-Screenshots", async ({ browser }) => {
   }).click();
   await expect(others.Ben.getByRole("status")).toBeVisible();
 
+  // Anna plant den Herd ein (Wecker-Icon), Ben ist im Urlaub (Koffer)
+  await others.Anna.getByRole("link", { name: /Herd reinigen/ }).click();
+  await others.Anna.getByRole("button", { name: "Morgen 18 Uhr" }).click();
+  await others.Anna.getByRole("button", { name: "⏰ Ich mach das" }).click();
+  await expect(others.Anna.getByTestId("commitment")).toBeVisible();
+  await others.Ben.goto("/urlaub");
+  await others.Ben.getByLabel("Von").fill(day(0));
+  await others.Ben.getByLabel("Bis (einschließlich)").fill(day(6));
+  await others.Ben.getByRole("button", { name: "🧳 Urlaub eintragen" }).click();
+  await expect(others.Ben.getByTestId("absence")).toContainText(
+    "Du bist im Urlaub",
+  );
+
   await max.goto("/wohnung");
   const iso = max.getByTestId("iso");
   await expect(iso).toHaveAttribute("data-ready", "true");
   await expect(iso).toHaveAttribute("data-avatars", "3");
+  await expect(iso).toHaveAttribute("data-badges", "1");
   await max.getByRole("button", { name: "Als Nächstes" }).click();
   await max.waitForTimeout(2500); // Avatare laufen los
   await shot(max, "00-wohnung");
@@ -269,4 +313,50 @@ test("README-Screenshots", async ({ browser }) => {
   await max.goto("/rangliste");
   await expect(max.getByRole("list", { name: "Podest" })).toBeVisible();
   await shot(max, "06-rangliste");
+
+  // Einplanen mit Kalender-Export
+  await max.goto("/aufgaben");
+  await max.getByRole("link", { name: /Restmüll/ }).click();
+  await max.getByRole("button", { name: "Morgen 18 Uhr" }).click();
+  await max.getByRole("button", { name: "⏰ Ich mach das" }).click();
+  await expect(max.getByTestId("commitment")).toBeVisible();
+  await max.getByRole("heading", { name: "Einplanen" }).evaluate((el) => {
+    window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 90);
+  });
+  await shot(max, "13-einplanen");
+
+  // Urlaub mit Urlaubspaket
+  await max.goto("/urlaub");
+  await max.getByLabel("Von").fill(day(10));
+  await max.getByLabel("Bis (einschließlich)").fill(day(17));
+  await max.getByRole("button", { name: "🧳 Urlaub eintragen" }).click();
+  await max
+    .getByRole("button", {
+      name: "Eigene Sachen im Kühlschrank prüfen abhaken",
+    })
+    .click();
+  await expect(
+    max.getByRole("button", { name: /Kühlschrank prüfen: erledigt/ }),
+  ).toBeVisible();
+  await max.evaluate(() => window.scrollTo(0, 0));
+  await shot(max, "15-urlaub");
+
+  // Mitteilungen
+  addNotifications("max", [
+    {
+      type: "daily_summary",
+      payload: { count: 2, names: ["Restmüll rausbringen", "Klo putzen"] },
+      minutesAgo: 180,
+    },
+    {
+      type: "commitment_due",
+      payload: { taskId: "", taskName: "Restmüll rausbringen" },
+      minutesAgo: 5,
+    },
+  ]);
+  await max.goto("/aufgaben");
+  await expect(max.getByTestId("bell-badge")).toBeVisible();
+  await max.getByTestId("bell").click();
+  await expect(max.getByTestId("notifications")).toBeVisible();
+  await shot(max, "14-mitteilungen");
 });

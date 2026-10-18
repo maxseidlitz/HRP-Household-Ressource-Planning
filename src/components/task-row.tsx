@@ -3,6 +3,7 @@ import { objectEmoji } from "@/catalog/objects";
 import { formatPoints } from "@/domain/points";
 import { relativeTime } from "@/domain/time";
 import type { CompleteResult, TaskView } from "@/server/queries/tasks";
+import { CommitmentBadge } from "./commitment-badge";
 import { CompleteButton } from "./complete-button";
 import { STATUS_LABELS, StatusBar } from "./status-bar";
 
@@ -16,10 +17,12 @@ export function dueLabel(t: TaskView, now: Date): string {
 export function TaskRow({
   task: t,
   now,
+  timeZone,
   onCompleted,
 }: {
   task: TaskView;
   now: Date;
+  timeZone: string;
   onCompleted?: (result: CompleteResult) => void;
 }) {
   return (
@@ -32,7 +35,12 @@ export function TaskRow({
         {objectEmoji(t.objectType)}
       </span>
       <Link href={`/aufgaben/${t.id}`} className="min-w-0 flex-1">
-        <span className="block truncate font-semibold">{t.name}</span>
+        <span className="flex items-center gap-1.5">
+          <span className="truncate font-semibold">{t.name}</span>
+          {t.commitment && (
+            <CommitmentBadge commitment={t.commitment} timeZone={timeZone} />
+          )}
+        </span>
         <span className="block truncate text-xs text-ink/65">
           {t.roomName} · {t.objectName} · {dueLabel(t, now)}
         </span>

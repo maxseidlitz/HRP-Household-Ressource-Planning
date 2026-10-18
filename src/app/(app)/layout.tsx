@@ -2,10 +2,15 @@ import Link from "next/link";
 import { parseAvatar } from "@/catalog/avatar";
 import { Avatar } from "@/components/avatar";
 import { LogoutButton } from "@/components/logout-button";
+import {
+  NotificationBell,
+  OtherHouseholdsDot,
+} from "@/components/notification-bell";
 import { TabBar } from "@/components/tab-bar";
 import { formatPoints } from "@/domain/points";
 import { switchHouseholdAction } from "@/server/actions/household";
 import { requireHousehold } from "@/server/context";
+import { unreadCounts } from "@/server/queries/notifications";
 import { householdLeaderboard } from "@/server/queries/tasks";
 
 export default async function AppLayout({
@@ -21,6 +26,10 @@ export default async function AppLayout({
       now: new Date(),
     }).find((e) => e.userId === ctx.user.id)?.points ?? 0;
   const avatar = parseAvatar(ctx.user.avatarJson, ctx.user.id);
+  const unread = unreadCounts(ctx.db, {
+    userId: ctx.user.id,
+    householdId: ctx.household.id,
+  });
 
   return (
     <>
@@ -39,12 +48,14 @@ export default async function AppLayout({
           >
             ⭐ {formatPoints(myPoints)}
           </span>
+          <NotificationBell initial={unread} />
           <details className="relative">
             <summary
-              className="flex cursor-pointer list-none items-center rounded-full border-2 border-ink bg-white p-0.5 [&::-webkit-details-marker]:hidden"
+              className="relative flex cursor-pointer list-none items-center rounded-full border-2 border-ink bg-white p-0.5 [&::-webkit-details-marker]:hidden"
               aria-label="Profilmenü"
             >
               <Avatar config={avatar} size={28} title={ctx.user.name} />
+              <OtherHouseholdsDot initial={unread} />
               {ctx.households.length > 1 && (
                 <span className="sr-only">WG wechseln</span>
               )}
@@ -87,6 +98,12 @@ export default async function AppLayout({
                   className="rounded-lg px-2 py-1.5 hover:bg-cream-dark"
                 >
                   🙂 Profil
+                </Link>
+                <Link
+                  href="/urlaub"
+                  className="rounded-lg px-2 py-1.5 hover:bg-cream-dark"
+                >
+                  🧳 Urlaub
                 </Link>
                 <LogoutButton className="rounded-lg px-2 py-1.5 text-left hover:bg-cream-dark" />
               </div>

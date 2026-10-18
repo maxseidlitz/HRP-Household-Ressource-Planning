@@ -45,6 +45,13 @@ export default async function AdminPage() {
       text: "Rollen, Passwort-Reset, entfernen",
       done: true,
     },
+    {
+      href: "/verwaltung/urlaubspaket",
+      icon: "🧳",
+      title: "Urlaubspaket",
+      text: "Welche Aufgaben „Saugen + Müll“ zurücksetzt",
+      done: true,
+    },
   ];
 
   return (
