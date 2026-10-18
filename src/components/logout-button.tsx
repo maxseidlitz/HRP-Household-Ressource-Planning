@@ -1,16 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
-export function LogoutButton() {
+export function LogoutButton({ className = "" }: { className?: string }) {
   const router = useRouter();
   return (
-    <Button
+    <button
       type="button"
-      variant="secondary"
-      className="w-full"
+      className={className}
       onClick={async () => {
         await authClient.signOut();
         router.replace("/login");
@@ -18,6 +16,6 @@ export function LogoutButton() {
       }}
     >
       Abmelden
-    </Button>
+    </button>
   );
 }

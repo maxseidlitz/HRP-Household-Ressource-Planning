@@ -21,6 +21,11 @@ const schema = z.object({
   /** http im Heimnetz, https nach dem Umzug (Phase 5). */
   APP_PROTOCOL: z.enum(["http", "https"]).default("http"),
   BETTER_AUTH_SECRET: z.string().min(32).optional(),
+  /**
+   * Schutz gegen Passwort-Raten (3 Logins pro 10 s und IP). Nur für
+   * automatisierte Tests abschalten, die alle von derselben IP kommen.
+   */
+  AUTH_RATE_LIMIT: z.enum(["on", "off"]).default("on"),
 });
 
 export type Env = z.infer<typeof schema>;

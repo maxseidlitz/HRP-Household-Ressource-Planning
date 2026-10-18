@@ -37,11 +37,19 @@ braucht es nicht.
 
 ## 📱 So sieht's aus
 
-|                             Anmelden                              |                                   Registrieren                                   |                                      Startseite                                       |
-| :---------------------------------------------------------------: | :------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------: |
-| <img src="docs/screenshots/01-login.png" width="240" alt="Login"> | <img src="docs/screenshots/02-registrieren.png" width="240" alt="Registrierung"> | <img src="docs/screenshots/03-start.png" width="240" alt="Startseite nach dem Login"> |
+|                                                     Aufgaben                                                     |                                              Aufgabe & Historie                                               |                                      Rangliste                                       |
+| :--------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/04-aufgaben.png" width="240" alt="Aufgabenliste nach Dringlichkeit mit Statusbalken"> | <img src="docs/screenshots/05-aufgabe.png" width="240" alt="Aufgabendetail mit Erledigt-Button und Historie"> | <img src="docs/screenshots/06-rangliste.png" width="240" alt="Rangliste mit Podest"> |
 
-> Stand: Phase 0. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
+|                                           Raum einrichten                                            |                                   Einladen per QR-Code                                    |                              Profil & Avatar                               |
+| :--------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: | :------------------------------------------------------------------------: |
+| <img src="docs/screenshots/03-raum.png" width="240" alt="Objekt mit Aufgabenvorschlägen hinzufügen"> | <img src="docs/screenshots/07-einladen.png" width="240" alt="Einladungslink mit QR-Code"> | <img src="docs/screenshots/08-profil.png" width="240" alt="Avatar-Editor"> |
+
+|                             Anmelden                              |                                  WG erstellen                                   |
+| :---------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
+| <img src="docs/screenshots/01-login.png" width="240" alt="Login"> | <img src="docs/screenshots/02-wg-erstellen.png" width="240" alt="WG erstellen"> |
+
+> Stand: Phase 1a. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
 > (`npm run screenshots`).
 
 ## ✨ Funktionen

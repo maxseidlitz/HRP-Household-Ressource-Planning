@@ -5,4 +5,6 @@ export async function register() {
   const { getDb } = await import("./db");
   const { runMigrations } = await import("./db/client");
   runMigrations(getDb());
+  const { startScheduler } = await import("./server/jobs/scheduler");
+  startScheduler();
 }

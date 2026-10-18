@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button, Field } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 
-export function LoginForm() {
+export function LoginForm({ next = "/" }: { next?: string }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -25,7 +25,7 @@ export function LoginForm() {
       setError("Benutzername oder Passwort stimmt nicht.");
       return;
     }
-    router.replace("/");
+    router.replace(next);
     router.refresh();
   }
 

@@ -38,3 +38,47 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
 }
+
+/* Überfällig: langsames rotes Pulsieren, 2 s Zyklus (Spez. 12.8). */
+@keyframes overdue-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@utility animate-overdue {
+  animation: overdue-pulse 2s ease-in-out infinite;
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}
+
+@utility animate-float-up {
+  animation: float-up 2.2s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-overdue,
+  .animate-float-up {
+    animation: none;
+  }
+}

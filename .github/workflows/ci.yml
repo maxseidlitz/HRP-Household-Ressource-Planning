@@ -26,12 +26,7 @@ jobs:
       - name: Playwright-Browser installieren
         run: npx playwright install --with-deps chromium
       - name: E2E gegen den Standalone-Server (http, Nicht-localhost-IP)
-        run: |
-          cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
-          (cd .next/standalone && DATA_DIR="$RUNNER_TEMP/data" PORT=3100 HOSTNAME=0.0.0.0 node server.js &)
-          HOST_IP=$(hostname -I | awk '{print $1}')
-          for i in $(seq 1 30); do curl -sf "http://$HOST_IP:3100/api/health" && break; sleep 1; done
-          E2E_BASE_URL="http://$HOST_IP:3100" npm run e2e
+        run: scripts/with-server.sh npm run e2e
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

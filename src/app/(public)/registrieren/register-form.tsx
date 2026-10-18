@@ -19,7 +19,16 @@ const ERRORS: Record<string, string> = {
   PASSWORD_TOO_SHORT: "Das Passwort muss mindestens 8 Zeichen haben.",
 };
 
-export function RegisterForm() {
+export function RegisterForm({
+  next = "/",
+  onRegistered,
+  submitLabel = "Account anlegen",
+}: {
+  next?: string;
+  /** Statt Weiterleitung, z. B. um direkt einer WG beizutreten. */
+  onRegistered?: () => Promise<void> | void;
+  submitLabel?: string;
+}) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -39,15 +48,20 @@ export function RegisterForm() {
       email: email || placeholderEmail(username),
       password,
     });
-    setPending(false);
     if (error) {
+      setPending(false);
       setError(
         (error.code && ERRORS[error.code]) ??
           "Registrierung fehlgeschlagen. Bitte prüfe deine Eingaben.",
       );
       return;
     }
-    router.replace("/");
+    if (onRegistered) {
+      await onRegistered();
+      setPending(false);
+      return;
+    }
+    router.replace(next);
     router.refresh();
   }
 
@@ -84,7 +98,7 @@ export function RegisterForm() {
         </p>
       )}
       <Button type="submit" disabled={pending}>
-        {pending ? "Anlegen …" : "Account anlegen"}
+        {pending ? "Anlegen …" : submitLabel}
       </Button>
     </form>
   );
