@@ -6,6 +6,7 @@ import { Avatar } from "@/components/avatar";
 import { commitmentLabel } from "@/components/commitment-badge";
 import { CommitmentForm } from "@/components/commitment-form";
 import { CompleteButton } from "@/components/complete-button";
+import { ObjectionMenu } from "@/components/objection-menu";
 import { STATUS_LABELS, StatusBar } from "@/components/status-bar";
 import { TaskEditForm } from "@/components/task-edit-form";
 import { dueLabel } from "@/components/task-row";
@@ -21,6 +22,7 @@ import {
 import { cancelCommitmentAction } from "@/server/actions/planning";
 import { deleteTaskAction, setTaskActiveAction } from "@/server/actions/rooms";
 import { requireHousehold } from "@/server/context";
+import { canObject, objectionsByCompletion } from "@/server/queries/objections";
 import { getTaskView, taskHistory } from "@/server/queries/tasks";
 
 export default async function TaskPage({
@@ -37,6 +39,25 @@ export default async function TaskPage({
   });
   if (!t) notFound();
   const history = taskHistory(ctx.db, t.id);
+  const objections = objectionsByCompletion(
+    ctx.db,
+    history.map((c) => c.id),
+  );
+  // Menü nur, wo ein Widerspruch gerade möglich ist (Spez. 6.3)
+  const objectable = new Set(
+    ctx.household.settings.objectionsEnabled && !t.isPrivate
+      ? history
+          .filter(
+            (c) =>
+              !canObject(ctx.db, {
+                viewerId: ctx.user.id,
+                completionId: c.id,
+                now,
+              }),
+          )
+          .map((c) => c.id)
+      : [],
+  );
   const canEdit = t.isPrivate || ctx.isAdmin;
   const tz = ctx.household.timezone;
   const { earlyThreshold, lateThreshold } = ctx.household.settings;
@@ -166,7 +187,7 @@ export default async function TaskPage({
             {history.map((c) => (
               <li
                 key={c.id}
-                className={`flex items-center gap-3 rounded-xl bg-white/60 px-3 py-2 ${c.status === "revoked" ? "line-through opacity-60" : ""}`}
+                className={`flex items-center gap-3 rounded-xl bg-white/60 px-3 py-2 ${c.status === "revoked" ? "opacity-60" : ""}`}
               >
                 <Avatar
                   config={parseAvatar(c.avatarJson, c.userId)}
@@ -174,15 +195,37 @@ export default async function TaskPage({
                   title={c.userName}
                 />
                 <span className="flex-1 text-sm">
-                  <strong>{c.userName}</strong>
+                  <strong
+                    className={c.status === "revoked" ? "line-through" : ""}
+                  >
+                    {c.userName}
+                  </strong>
                   <span className="block text-xs text-ink/65">
                     {formatDateTime(c.completedAt, tz)}
+                    {c.source === "vacation" && " · Urlaubspaket"}
                   </span>
+                  {objections.has(c.id) && (
+                    <Link
+                      href={`/widerspruch/${objections.get(c.id)}`}
+                      className="mt-0.5 inline-block rounded-full border border-ink/40 bg-white px-2 text-xs font-semibold"
+                    >
+                      {c.status === "contested"
+                        ? "✋ angefochten · abstimmen"
+                        : c.status === "revoked"
+                          ? "↩️ zurückgesetzt"
+                          : "✅ Widerspruch abgelehnt"}
+                    </Link>
+                  )}
                 </span>
                 {!t.isPrivate && (
-                  <span className="text-sm font-bold">
+                  <span
+                    className={`text-sm font-bold ${c.status !== "valid" ? "text-ink/40 line-through" : ""}`}
+                  >
                     {c.points > 0 ? `+${formatPoints(c.points)}` : "0"}
                   </span>
+                )}
+                {objectable.has(c.id) && (
+                  <ObjectionMenu completionId={c.id} userName={c.userName} />
                 )}
               </li>
             ))}

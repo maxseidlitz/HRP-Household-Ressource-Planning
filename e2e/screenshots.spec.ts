@@ -140,6 +140,12 @@ test("README-Screenshots", async ({ browser }) => {
     await chooseAvatar(p, [...avatar]);
     others[name] = p;
   }
+  // Widerspruch vom Admin einschalten, sonst steht die Abstimmung überall
+  await max.goto("/verwaltung/einstellungen");
+  await max
+    .getByRole("button", { name: "Widerspruch jetzt einschalten" })
+    .click();
+  await expect(max.getByTestId("objection-status")).toContainText("An");
 
   // Räume, Objekte, Aufgaben
   await createRoom(max, { type: "Küche", name: "Küche" });
@@ -359,4 +365,39 @@ test("README-Screenshots", async ({ browser }) => {
   await max.getByTestId("bell").click();
   await expect(max.getByTestId("notifications")).toBeVisible();
   await shot(max, "14-mitteilungen");
+
+  // Widerspruch: Anna findet Bens Waschbecken nicht sauber
+  await others.Anna.goto("/aufgaben");
+  await others.Anna.getByRole("link", { name: /Waschbecken/ }).click();
+  await others.Anna.getByLabel("Optionen für die Erledigung von Ben").click();
+  await others.Anna.getByRole("button", { name: "✋ Nicht erledigt" }).click();
+  await expect(others.Anna).toHaveURL(/\/widerspruch\//);
+  await max.goto("/aufgaben");
+  await max.getByTestId("pending-vote").click();
+  await expect(max.getByTestId("tally")).toBeVisible();
+  await shot(max, "16-widerspruch");
+
+  // Feedback von Anna, Admin-Ansicht
+  await others.Anna.goto("/feedback?von=%2Fwohnung");
+  await others.Anna.locator("label", { hasText: "💡 Idee" }).click();
+  await others.Anna.getByLabel("Beschreibung").fill(
+    "Können wir im Diorama auch Wäscheständer aufstellen? Der steht bei uns ständig im Flur. 😄",
+  );
+  await others.Anna.getByRole("button", { name: "Feedback senden" }).click();
+  await expect(others.Anna.getByText(/Danke!/)).toBeVisible();
+  await max.goto("/verwaltung/feedback");
+  await max.getByRole("link", { name: /Wäscheständer/ }).click();
+  await expect(max).toHaveURL(/\/verwaltung\/feedback\/.+/);
+  await max
+    .getByRole("combobox", { name: "Status" })
+    .selectOption("in_progress");
+  await max
+    .getByLabel("Antwort an den Absender")
+    .fill("Gute Idee, kommt auf die Liste!");
+  await max.evaluate(() => window.scrollTo(0, 0));
+  await shot(max, "18-feedback");
+
+  await max.goto("/verwaltung/statistik?tage=7");
+  await expect(max.getByTestId("kpis")).toBeVisible();
+  await shot(max, "17-statistik");
 });

@@ -31,7 +31,7 @@ function setup() {
   const h = createHousehold(db, {
     userId: "max",
     name: "WG",
-    expectedMemberCount: 2,
+    expectedMemberCount: 3, // noch keine Abstimmung zur Widerspruchsfunktion
   });
   const i = createInvite(db, {
     householdId: h.id,

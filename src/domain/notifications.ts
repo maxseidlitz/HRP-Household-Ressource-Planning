@@ -6,6 +6,20 @@ export type NotificationPayloads = {
   daily_summary: { count: number; names: string[] };
   member_joined: { userName: string };
   absence_started: { userName: string; until: string };
+  objection_filed: { objectionId: string; taskName: string; userName: string };
+  objection_vote: {
+    objectionId: string;
+    taskName: string;
+    completerName: string;
+  };
+  objection_resolved: {
+    objectionId: string;
+    taskName: string;
+    resolution: "valid" | "revoked";
+  };
+  objections_enabled: { by: "vote" | "admin"; userName?: string };
+  feature_vote_request: { feature: "objections" };
+  feedback_reply: { ticketId: string; reply: string };
 };
 
 export type NotificationType = keyof NotificationPayloads;
@@ -70,6 +84,48 @@ export function describeNotification(
         icon: "🧳",
         text: `${p.userName} ist ab heute im Urlaub (bis ${p.until}).`,
         href: null,
+      };
+    case "objection_filed":
+      return {
+        icon: "✋",
+        text: `${p.userName} sagt, „${p.taskName}“ wurde nicht erledigt. Die WG stimmt ab.`,
+        href: `/widerspruch/${String(p.objectionId)}`,
+      };
+    case "objection_vote":
+      return {
+        icon: "🗳️",
+        text: `Abstimmung: Hat ${p.completerName} „${p.taskName}“ wirklich erledigt?`,
+        href: `/widerspruch/${String(p.objectionId)}`,
+      };
+    case "objection_resolved":
+      return {
+        icon: p.resolution === "revoked" ? "↩️" : "✅",
+        text:
+          p.resolution === "revoked"
+            ? `Widerspruch angenommen: „${p.taskName}“ gilt als nicht erledigt.`
+            : `Widerspruch abgelehnt: „${p.taskName}“ bleibt erledigt.`,
+        href: `/widerspruch/${String(p.objectionId)}`,
+      };
+    case "objections_enabled":
+      return {
+        icon: "⚖️",
+        text:
+          p.by === "admin"
+            ? `${p.userName ?? "Ein Admin"} hat die Widerspruchsfunktion eingeschaltet.`
+            : "Alle haben zugestimmt: Erledigungen können jetzt angefochten werden.",
+        href: null,
+      };
+    case "feature_vote_request":
+      return {
+        icon: "🗳️",
+        text: "Sollen Erledigungen angefochten werden können? Stimm ab!",
+        href: "/aufgaben",
+      };
+    case "feedback_reply":
+      return {
+        icon: "💬",
+        text: `Antwort auf dein Feedback: ${String(p.reply).slice(0, 120)}`,
+        href: "/feedback",
       };
     default:
       return { icon: "🔔", text: "Neue Mitteilung", href: null };

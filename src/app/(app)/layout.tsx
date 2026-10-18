@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { parseAvatar } from "@/catalog/avatar";
 import { Avatar } from "@/components/avatar";
+import { FeedbackLink } from "@/components/feedback-link";
+import { HouseholdPrompts } from "@/components/household-prompts";
 import { LogoutButton } from "@/components/logout-button";
+import { MenuDetails } from "@/components/menu-details";
 import {
   NotificationBell,
   OtherHouseholdsDot,
@@ -49,7 +52,7 @@ export default async function AppLayout({
             ⭐ {formatPoints(myPoints)}
           </span>
           <NotificationBell initial={unread} />
-          <details className="relative">
+          <MenuDetails className="relative">
             <summary
               className="relative flex cursor-pointer list-none items-center rounded-full border-2 border-ink bg-white p-0.5 [&::-webkit-details-marker]:hidden"
               aria-label="Profilmenü"
@@ -105,13 +108,19 @@ export default async function AppLayout({
                 >
                   🧳 Urlaub
                 </Link>
+                <FeedbackLink className="rounded-lg px-2 py-1.5 hover:bg-cream-dark" />
                 <LogoutButton className="rounded-lg px-2 py-1.5 text-left hover:bg-cream-dark" />
               </div>
             </div>
-          </details>
+          </MenuDetails>
         </div>
       </header>
       <main className="mx-auto w-full max-w-xl flex-1 px-4 pt-4 pb-28">
+        <HouseholdPrompts
+          db={ctx.db}
+          householdId={ctx.household.id}
+          viewerId={ctx.user.id}
+        />
         {children}
       </main>
       <TabBar isAdmin={ctx.isAdmin} />
