@@ -50,6 +50,18 @@ docker/                Entrypoint
 | **4 – Admin**               | Statistik-Dashboard, Feedback-Tickets (Screenshot ≤ 5 MB), Einstellungen, JSON-Export, Widerspruch inkl. Aktivierungs-Abstimmung und Mehrheitsauswertung                                                                                                                                                                                                                                                                                                              | –                                                                                                          |
 | **5 – Umzug**               | Domain, HTTPS via Reverse Proxy (Caddy), `APP_PROTOCOL=https`, Service Worker, PWA-Installation, Web Push (VAPID)                                                                                                                                                                                                                                                                                                                                                     | –                                                                                                          |
 
+## Dokumentation
+
+Jede Phase endet mit einer aktualisierten README:
+
+- **Schnellstart** bleibt der erste Abschnitt (ZimaOS, Docker, Entwicklung).
+- Screenshots werden mit `npm run screenshots` neu erzeugt (frischer Build,
+  leere DB, iPhone-Viewport) und pro Phase um die neuen Screens ergänzt.
+- Die Funktionstabelle zeigt den aktuellen Stand je Phase.
+- Zum Projektabschluss: README als Produktseite überarbeiten (Hero-Screenshot
+  des Dioramas, kurze Animation/GIF des Erledigen-Ablaufs, vollständige
+  Screen-Galerie).
+
 ## Risiken
 
 1. **Phase 2** ist der größte Brocken (Wegfindung, Animationen, Sprites). Darum

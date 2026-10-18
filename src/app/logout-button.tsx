@@ -9,7 +9,8 @@ export function LogoutButton() {
   return (
     <Button
       type="button"
-      className="w-full bg-cream"
+      variant="secondary"
+      className="w-full"
       onClick={async () => {
         await authClient.signOut();
         router.replace("/login");

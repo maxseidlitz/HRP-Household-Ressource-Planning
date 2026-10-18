@@ -12,7 +12,8 @@
     "e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "screenshots": "scripts/screenshots.sh"
   },
   "dependencies": {
     "better-auth": "^1.7.10",

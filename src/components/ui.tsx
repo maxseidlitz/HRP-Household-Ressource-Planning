@@ -1,10 +1,19 @@
 import type { ComponentProps } from "react";
 
+const BUTTON_VARIANTS = {
+  primary: "bg-sage",
+  secondary: "bg-cream",
+};
+
 /** Button mit leichtem 3D-Kanten-Look passend zum Diorama (Spez. 12.6). */
-export function Button({ className = "", ...props }: ComponentProps<"button">) {
+export function Button({
+  variant = "primary",
+  className = "",
+  ...props
+}: ComponentProps<"button"> & { variant?: keyof typeof BUTTON_VARIANTS }) {
   return (
     <button
-      className={`rounded-xl border-2 border-ink border-b-4 bg-sage px-4 py-2.5 font-semibold text-ink transition active:translate-y-0.5 active:border-b-2 disabled:opacity-60 ${className}`}
+      className={`rounded-xl border-2 border-ink border-b-4 px-4 py-2.5 font-semibold text-ink transition active:translate-y-0.5 active:border-b-2 disabled:opacity-60 ${BUTTON_VARIANTS[variant]} ${className}`}
       {...props}
     />
   );
