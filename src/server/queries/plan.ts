@@ -15,7 +15,7 @@ import {
 } from "@/domain/grid";
 import { statusColor, worstStatus, type TaskStatus } from "@/domain/progress";
 import { assert } from "../errors";
-import { getMembership } from "./households";
+import { getMembership } from "./members";
 import { canEditRoom, getObjectForEdit, getRoomForEdit } from "./rooms";
 import { listTaskViews, type TaskView } from "./tasks";
 

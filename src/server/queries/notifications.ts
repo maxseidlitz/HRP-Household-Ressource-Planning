@@ -6,14 +6,12 @@ import type {
   NotificationType,
 } from "@/domain/notifications";
 
-type Tx = Pick<DB, "select" | "insert" | "update" | "delete">;
-
 /**
  * Legt eine Mitteilung an. Mit dedupeKey entsteht sie höchstens einmal,
  * auch wenn der Scheduler mehrfach läuft (Spez. 8).
  */
 export function notify<T extends NotificationType>(
-  db: Tx,
+  db: DB,
   input: {
     userId: string;
     householdId: string | null;
@@ -38,7 +36,7 @@ export function notify<T extends NotificationType>(
 
 /** Mitteilung an alle anderen Mitglieder einer WG. */
 export function notifyHousehold<T extends NotificationType>(
-  db: Tx,
+  db: DB,
   input: {
     householdId: string;
     exceptUserId: string;

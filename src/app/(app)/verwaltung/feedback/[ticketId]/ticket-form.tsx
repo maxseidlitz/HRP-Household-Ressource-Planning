@@ -2,11 +2,8 @@
 
 import { useActionState } from "react";
 import { FormMessage } from "@/components/form-state";
-import { Button } from "@/components/ui";
+import { Button, inputClass } from "@/components/ui";
 import { updateFeedbackAction } from "@/server/actions/admin";
-
-const inputCls =
-  "rounded-xl border border-black/10 bg-white/70 px-3.5 py-2.5 text-base font-normal outline-none transition focus:border-sage focus:bg-white focus:ring-4 focus:ring-sage/15";
 
 export function TicketForm({
   ticketId,
@@ -27,7 +24,7 @@ export function TicketForm({
       <input type="hidden" name="ticketId" value={ticketId} />
       <label className="flex flex-col gap-1 text-sm font-medium">
         Status
-        <select name="status" defaultValue={status} className={inputCls}>
+        <select name="status" defaultValue={status} className={inputClass}>
           {statuses.map(([value, label]) => (
             <option key={value} value={value}>
               {label}
@@ -41,7 +38,7 @@ export function TicketForm({
           name="adminNote"
           rows={2}
           defaultValue={adminNote}
-          className={inputCls}
+          className={inputClass}
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-medium">
@@ -50,7 +47,7 @@ export function TicketForm({
           name="adminReply"
           rows={3}
           defaultValue={adminReply}
-          className={inputCls}
+          className={inputClass}
         />
         <span className="text-xs font-normal text-ink/60">
           Kommt als Mitteilung an.

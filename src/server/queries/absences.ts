@@ -14,7 +14,7 @@ import {
 } from "@/db/schema";
 import { defaultLinkedTasks, VACATION_POINTS } from "@/domain/vacation";
 import { assert } from "../errors";
-import { getMembership } from "./households";
+import { requireAdminMembership } from "./members";
 
 const MAX_DAYS = 120;
 
@@ -152,8 +152,12 @@ export function setLinkedTasks(
   db: DB,
   input: { householdId: string; actorId: string; taskIds: string[] },
 ) {
-  const m = getMembership(db, input.householdId, input.actorId);
-  assert(m?.role === "admin", "Nur Admins dürfen das Urlaubspaket einstellen.");
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen das Urlaubspaket einstellen.",
+  );
   const allowed = new Set(
     linkCandidates(db, input.householdId).map((t) => t.id),
   );
@@ -232,10 +236,7 @@ export function completeVacationItem(
       .where(eq(vacationBundle.id, row.bundle.id))
       .run();
     if (input.item === "vacuumTrash") {
-      for (const taskId of linkedTaskIds(
-        tx as unknown as DB,
-        input.householdId,
-      )) {
+      for (const taskId of linkedTaskIds(tx, input.householdId)) {
         tx.insert(completion)
           .values({
             taskId,

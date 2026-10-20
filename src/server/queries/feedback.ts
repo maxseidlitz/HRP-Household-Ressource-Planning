@@ -2,8 +2,9 @@ import { and, desc, eq } from "drizzle-orm";
 import type { DB } from "@/db/client";
 import { feedbackTicket, user } from "@/db/schema";
 import { assert } from "../errors";
-import { getMembership } from "./households";
+import { getMembership } from "./members";
 import { notify } from "./notifications";
+import { requireAdminMembership } from "./members";
 
 export const FEEDBACK_CATEGORIES = {
   bug: "Bug",
@@ -113,8 +114,12 @@ export function updateFeedback(
     now: Date;
   },
 ) {
-  const m = getMembership(db, input.householdId, input.actorId);
-  assert(m?.role === "admin", "Nur Admins dürfen Tickets bearbeiten.");
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen Tickets bearbeiten.",
+  );
   const found = getFeedback(db, input);
   assert(found, "Ticket nicht gefunden.");
   assert(input.status in FEEDBACK_STATUS, "Unbekannter Status.");

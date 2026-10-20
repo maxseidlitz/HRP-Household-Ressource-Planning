@@ -5,7 +5,6 @@ import {
   completion,
   household,
   householdObject,
-  membership,
   room,
   task,
   user,
@@ -28,6 +27,7 @@ import {
 import { parseSettings, resolveThresholds } from "@/domain/settings";
 import { assert } from "../errors";
 import { vacationScores } from "./absences";
+import { memberIds } from "./members";
 import { visibleTo } from "./rooms";
 
 export type TaskView = {
@@ -248,7 +248,7 @@ export function completeTask(
       };
     }
 
-    const view = listTaskViews(tx as unknown as DB, {
+    const view = listTaskViews(tx, {
       householdId: input.householdId,
       viewerId: input.userId,
       now: input.now,
@@ -301,12 +301,7 @@ export function householdLeaderboard(
   assert(h, "WG nicht gefunden.");
   const since = periodStart(input.period, input.now, h.timezone);
 
-  const members = db
-    .select({ userId: membership.userId })
-    .from(membership)
-    .where(eq(membership.householdId, input.householdId))
-    .all()
-    .map((m) => m.userId);
+  const members = memberIds(db, input.householdId);
 
   // Private Zimmer zählen nie (Spez. 4.2).
   const completions = db

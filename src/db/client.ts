@@ -1,5 +1,7 @@
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
+import type { RunResult } from "better-sqlite3";
+import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import path from "node:path";
 import * as schema from "./schema";
@@ -12,9 +14,16 @@ export function createDatabase(file: string) {
   return drizzle(sqlite, { schema });
 }
 
-export type DB = ReturnType<typeof createDatabase>;
+/** Die geöffnete Datenbankverbindung. */
+export type Connection = ReturnType<typeof createDatabase>;
 
-export function runMigrations(db: DB) {
+/**
+ * Verbindung oder laufende Transaktion. Abfragen nehmen diesen Typ, damit
+ * sie in einer Transaktion ohne Cast weiterverwendet werden können.
+ */
+export type DB = BaseSQLiteDatabase<"sync", RunResult, typeof schema>;
+
+export function runMigrations(db: Connection) {
   migrate(db, {
     migrationsFolder: path.join(process.cwd(), "drizzle"),
   });

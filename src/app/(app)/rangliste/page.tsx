@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { segmentTrack, segmentClass } from "@/components/ui";
 import { parseAvatar } from "@/catalog/avatar";
 import { Avatar } from "@/components/avatar";
 import type { LeaderboardPeriod } from "@/domain/leaderboard";
@@ -59,7 +60,7 @@ export default async function LeaderboardPage({
       <div
         role="tablist"
         aria-label="Zeitraum"
-        className="grid grid-cols-2 rounded-full bg-black/[0.06] p-0.5"
+        className={`grid grid-cols-2 ${segmentTrack}`}
       >
         {(
           [
@@ -72,7 +73,7 @@ export default async function LeaderboardPage({
             href={href}
             role="tab"
             aria-selected={period === p}
-            className={`rounded-full py-1.5 text-center text-sm font-semibold ${period === p ? "bg-white text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]" : "text-ink/60"}`}
+            className={`py-1.5 text-center text-sm font-semibold ${segmentClass(period === p)}`}
           >
             {label}
           </Link>

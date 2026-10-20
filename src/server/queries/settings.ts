@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import type { DB } from "@/db/client";
-import { featureVote, household, membership, user } from "@/db/schema";
+import { featureVote, household, user } from "@/db/schema";
 import { featureVoteState } from "@/domain/objection";
 import {
   householdSettingsSchema,
@@ -8,15 +8,10 @@ import {
   type HouseholdSettings,
 } from "@/domain/settings";
 import { assert } from "../errors";
-import { getMembership } from "./households";
+import { getMembership, memberIds, requireAdminMembership } from "./members";
 import { notify, notifyHousehold } from "./notifications";
 
 const FEATURE = "objections";
-
-function requireAdminOf(db: DB, householdId: string, actorId: string) {
-  const m = getMembership(db, householdId, actorId);
-  assert(m?.role === "admin", "Nur Admins dürfen das ändern.");
-}
 
 function readSettings(db: DB, householdId: string): HouseholdSettings {
   const h = db
@@ -47,7 +42,12 @@ export function updateThresholds(
     icsAlarmMinutes: number;
   },
 ) {
-  requireAdminOf(db, input.householdId, input.actorId);
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen das ändern.",
+  );
   const { earlyThreshold, lateThreshold, minProgress, icsAlarmMinutes } = input;
   assert(
     earlyThreshold > 0 && earlyThreshold < 1,
@@ -81,11 +81,16 @@ export function setObjectionsEnabled(
   db: DB,
   input: { householdId: string; actorId: string; enabled: boolean },
 ) {
-  requireAdminOf(db, input.householdId, input.actorId);
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen das ändern.",
+  );
   const s = readSettings(db, input.householdId);
   if (s.objectionsEnabled === input.enabled) return;
   db.transaction((tx) => {
-    writeSettings(tx as unknown as DB, input.householdId, {
+    writeSettings(tx, input.householdId, {
       ...s,
       objectionsEnabled: input.enabled,
       objectionsEnabledBy: input.enabled ? "admin" : null,
@@ -118,12 +123,7 @@ export function objectionVoteState(
     .get();
   assert(h, "WG nicht gefunden.");
   const settings = parseSettings(h.settingsJson);
-  const memberIds = db
-    .select({ userId: membership.userId })
-    .from(membership)
-    .where(eq(membership.householdId, input.householdId))
-    .all()
-    .map((m) => m.userId);
+  const members = memberIds(db, input.householdId);
   const votes = new Map(
     db
       .select({ userId: featureVote.userId, vote: featureVote.vote })
@@ -139,7 +139,7 @@ export function objectionVoteState(
   );
   return {
     ...featureVoteState({
-      memberIds,
+      memberIds: members,
       votes,
       expectedMemberCount: h.expectedMemberCount,
     }),
@@ -162,7 +162,6 @@ export function castFeatureVote(
     "Du bist kein Mitglied dieser WG.",
   );
   return db.transaction((tx) => {
-    const t = tx as unknown as DB;
     tx.insert(featureVote)
       .values({
         householdId: input.householdId,
@@ -179,30 +178,25 @@ export function castFeatureVote(
         set: { vote: input.vote },
       })
       .run();
-    const state = objectionVoteState(t, {
+    const state = objectionVoteState(tx, {
       householdId: input.householdId,
       viewerId: input.userId,
     });
     if (state.accepted && !state.enabled) {
-      writeSettings(t, input.householdId, {
-        ...readSettings(t, input.householdId),
+      writeSettings(tx, input.householdId, {
+        ...readSettings(tx, input.householdId),
         objectionsEnabled: true,
         objectionsEnabledBy: "vote",
       });
-      const members = tx
-        .select({ userId: membership.userId })
-        .from(membership)
-        .where(eq(membership.householdId, input.householdId))
-        .all();
-      for (const m of members)
+      for (const userId of memberIds(tx, input.householdId))
         notify(tx, {
-          userId: m.userId,
+          userId,
           householdId: input.householdId,
           type: "objections_enabled",
           payload: { by: "vote" },
         });
     }
-    return objectionVoteState(t, {
+    return objectionVoteState(tx, {
       householdId: input.householdId,
       viewerId: input.userId,
     });
@@ -216,17 +210,12 @@ export function castFeatureVote(
 export function requestFeatureVoteIfReady(db: DB, householdId: string) {
   const state = objectionVoteState(db, { householdId, viewerId: "" });
   if (!state.open || state.enabled) return;
-  const members = db
-    .select({ userId: membership.userId })
-    .from(membership)
-    .where(eq(membership.householdId, householdId))
-    .all();
-  for (const m of members)
+  for (const userId of memberIds(db, householdId))
     notify(db, {
-      userId: m.userId,
+      userId,
       householdId,
       type: "feature_vote_request",
       payload: { feature: "objections" },
-      dedupeKey: `featurevote:${householdId}:${m.userId}`,
+      dedupeKey: `featurevote:${householdId}:${userId}`,
     });
 }

@@ -3,8 +3,9 @@ import { and, eq, isNull } from "drizzle-orm";
 import type { DB } from "@/db/client";
 import { account, passwordReset, session, user } from "@/db/schema";
 import { assert, DomainError } from "../errors";
-import { getMembership } from "./households";
+import { getMembership } from "./members";
 import { newToken } from "./invites";
+import { requireAdminMembership } from "./members";
 
 const VALID_MS = 24 * 60 * 60 * 1000;
 
@@ -16,8 +17,12 @@ export function createPasswordReset(
   db: DB,
   input: { householdId: string; actorId: string; targetId: string; now: Date },
 ) {
-  const actor = getMembership(db, input.householdId, input.actorId);
-  assert(actor?.role === "admin", "Nur Admins dürfen Reset-Links erzeugen.");
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen Reset-Links erzeugen.",
+  );
   assert(
     getMembership(db, input.householdId, input.targetId),
     "Diese Person ist kein Mitglied.",

@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { objectEmoji, suggestionsFor } from "@/catalog/objects";
 import { ROOM_TYPE_EMOJI, ROOM_TYPE_LABELS } from "@/catalog/rooms";
 import { room } from "@/db/schema";
-import { Button } from "@/components/ui";
+import { Button, inputClass } from "@/components/ui";
 import { formatPoints } from "@/domain/points";
 import {
   assignRoomAction,
@@ -204,7 +204,7 @@ export default async function RoomPage({
                   <select
                     name="privateOwnerId"
                     defaultValue={r.privateOwnerId ?? ""}
-                    className="rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-base font-normal outline-none focus:border-sage focus:ring-4 focus:ring-sage/15"
+                    className={inputClass}
                   >
                     <option value="">— niemandem (Gemeinschaftsraum) —</option>
                     {members.map((m) => (
