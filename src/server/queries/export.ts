@@ -8,8 +8,8 @@ import {
   room,
   task,
 } from "@/db/schema";
-import { assert } from "../errors";
-import { getHousehold, getMembership, listMembers } from "./households";
+import { getHousehold, listMembers } from "./households";
+import { requireAdminMembership } from "./members";
 
 /**
  * Datenexport als JSON (Spez. 9.3): alles aus den Gemeinschaftsräumen,
@@ -19,8 +19,12 @@ export function exportHousehold(
   db: DB,
   input: { householdId: string; actorId: string; now: Date },
 ) {
-  const m = getMembership(db, input.householdId, input.actorId);
-  assert(m?.role === "admin", "Nur Admins dürfen exportieren.");
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen exportieren.",
+  );
   const h = getHousehold(db, input.householdId)!;
 
   const rooms = db

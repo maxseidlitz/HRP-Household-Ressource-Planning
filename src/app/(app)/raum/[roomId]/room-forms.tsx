@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useActionState, useState } from "react";
+import { useActionState, useState } from "react";
 import {
   libraryFor,
   suggestionsFor,
@@ -8,38 +8,11 @@ import {
 } from "@/catalog/objects";
 import { ROOM_TYPE_LABELS, type RoomType } from "@/catalog/rooms";
 import { FormMessage } from "@/components/form-state";
+import { submitWithoutReset, useSuccessCounter } from "@/components/form-hooks";
 import { TaskPicker } from "@/components/task-picker";
-import { Button, Field } from "@/components/ui";
+import { Button, Field, inputClass } from "@/components/ui";
 import { createSubroomAction } from "@/server/actions/plan";
 import { addObjectAction, addTasksAction } from "@/server/actions/rooms";
-import type { FormState } from "@/server/actions/result";
-
-/**
- * Sendet das Formular ohne Reacts automatisches Zurücksetzen nach der
- * Aktion. Das Zurücksetzen kann sonst eine inzwischen geänderte Auswahl
- * überschreiben; hier übernimmt das der key über useSuccessCounter.
- */
-function submitWithoutReset(action: (fd: FormData) => void) {
-  return (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    startTransition(() => action(fd));
-  };
-}
-
-/**
- * Zählt erfolgreiche Absendungen, um die Eingaben danach zurückzusetzen
- * (als key). Bei Fehlern bleiben die Eingaben stehen.
- */
-function useSuccessCounter(state: FormState) {
-  const [seen, setSeen] = useState(state);
-  const [count, setCount] = useState(0);
-  if (state !== seen) {
-    setSeen(state);
-    if (state?.ok) setCount((c) => c + 1);
-  }
-  return count;
-}
 
 export function AddObjectForm({
   roomId,
@@ -65,7 +38,7 @@ export function AddObjectForm({
           name="type"
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-base font-normal outline-none focus:border-sage focus:ring-4 focus:ring-sage/15"
+          className={inputClass}
         >
           {library.map((o) => (
             <option key={o.type} value={o.type}>
@@ -135,11 +108,7 @@ export function SubroomForm({ parentRoomId }: { parentRoomId: string }) {
       <div className="grid grid-cols-2 gap-2">
         <label className="flex flex-col gap-1 text-sm font-medium">
           Typ
-          <select
-            name="type"
-            defaultValue="bath"
-            className="rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-base font-normal outline-none focus:border-sage focus:ring-4 focus:ring-sage/15"
-          >
+          <select name="type" defaultValue="bath" className={inputClass}>
             {(["bath", "wc", "kitchen", "storage", "other"] as const).map(
               (t) => (
                 <option key={t} value={t}>

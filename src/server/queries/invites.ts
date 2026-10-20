@@ -3,9 +3,10 @@ import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import type { DB } from "@/db/client";
 import { household, invite, membership, user } from "@/db/schema";
 import { assert, DomainError } from "../errors";
-import { getMembership } from "./households";
+import { getMembership } from "./members";
 import { notifyHousehold } from "./notifications";
 import { requestFeatureVoteIfReady } from "./settings";
+import { requireAdminMembership } from "./members";
 
 export function newToken(): string {
   return randomBytes(24).toString("base64url");
@@ -21,8 +22,12 @@ export function createInvite(
     now: Date;
   },
 ) {
-  const actor = getMembership(db, input.householdId, input.actorId);
-  assert(actor?.role === "admin", "Nur Admins dürfen einladen.");
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen einladen.",
+  );
   assert(
     input.validDays >= 1 && input.validDays <= 90,
     "Gültigkeit: 1 bis 90 Tage.",
@@ -54,8 +59,12 @@ export function revokeInvite(
   db: DB,
   input: { householdId: string; actorId: string; inviteId: string; now: Date },
 ) {
-  const actor = getMembership(db, input.householdId, input.actorId);
-  assert(actor?.role === "admin", "Nur Admins dürfen Einladungen widerrufen.");
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen Einladungen widerrufen.",
+  );
   db.update(invite)
     .set({ revokedAt: input.now })
     .where(
@@ -119,11 +128,7 @@ export function acceptInvite(
       .where(eq(invite.token, input.token))
       .get();
     if (!i) throw new DomainError("Diesen Einladungslink gibt es nicht.");
-    const already = getMembership(
-      tx as unknown as DB,
-      i.householdId,
-      input.userId,
-    );
+    const already = getMembership(tx, i.householdId, input.userId);
     if (!already) {
       const state = inviteState(i, input.now);
       if (state !== "valid") throw new DomainError(STATE_MESSAGES[state]);
@@ -150,7 +155,7 @@ export function acceptInvite(
         payload: { userName: joined?.name ?? "Jemand" },
         dedupePrefix: `joined:${i.householdId}:${input.userId}`,
       });
-      requestFeatureVoteIfReady(tx as unknown as DB, i.householdId);
+      requestFeatureVoteIfReady(tx, i.householdId);
     }
     tx.update(user)
       .set({ lastHouseholdId: i.householdId })

@@ -4,7 +4,6 @@ import {
   completion,
   household,
   householdObject,
-  membership,
   objection,
   objectionVote,
   room,
@@ -21,6 +20,7 @@ import {
 import { parseSettings } from "@/domain/settings";
 import { assert } from "../errors";
 import { awayUserIds } from "./absences";
+import { getMembership, memberIds } from "./members";
 import { notify } from "./notifications";
 
 /** Erledigung mit Aufgabe, Raum und WG – Basis für alle Prüfungen. */
@@ -53,13 +53,9 @@ function eligibleVoters(
   db: DB,
   input: { householdId: string; completerId: string; at: Date },
 ): string[] {
-  const ids = db
-    .select({ userId: membership.userId })
-    .from(membership)
-    .where(eq(membership.householdId, input.householdId))
-    .all()
-    .map((m) => m.userId)
-    .filter((id) => id !== input.completerId);
+  const ids = memberIds(db, input.householdId).filter(
+    (id) => id !== input.completerId,
+  );
   const away = awayUserIds(db, ids, input.at);
   return ids.filter((id) => !away.has(id));
 }
@@ -70,7 +66,7 @@ export function canObject(
 ): string | null {
   const row = loadCompletion(db, input.completionId);
   if (!row) return "Erledigung nicht gefunden.";
-  const isMember = getMember(db, row.householdId, input.viewerId);
+  const isMember = getMembership(db, row.householdId, input.viewerId);
   if (!isMember) return "Erledigung nicht gefunden.";
   return objectionBlocker({
     enabled: parseSettings(row.settingsJson).objectionsEnabled,
@@ -82,19 +78,6 @@ export function canObject(
     ),
     now: input.now,
   });
-}
-
-function getMember(db: DB, householdId: string, userId: string) {
-  return db
-    .select()
-    .from(membership)
-    .where(
-      and(
-        eq(membership.householdId, householdId),
-        eq(membership.userId, userId),
-      ),
-    )
-    .get();
 }
 
 /**
@@ -120,7 +103,6 @@ export function fileObjection(
   assert(row.householdId === input.householdId, "Erledigung nicht gefunden.");
 
   const id = db.transaction((tx) => {
-    const t = tx as unknown as DB;
     const [o] = tx
       .insert(objection)
       .values({
@@ -154,7 +136,7 @@ export function fileObjection(
         userName: objector?.name ?? "Jemand",
       },
     });
-    for (const voter of eligibleVoters(t, {
+    for (const voter of eligibleVoters(tx, {
       householdId: row.householdId,
       completerId: row.completion.userId,
       at: input.now,
@@ -286,7 +268,7 @@ export function getObjectionView(
     .get();
   if (!o) return null;
   const row = loadCompletion(db, o.completionId);
-  if (!row || !getMember(db, row.householdId, input.viewerId)) return null;
+  if (!row || !getMembership(db, row.householdId, input.viewerId)) return null;
   const eligible = eligibleVoters(db, {
     householdId: row.householdId,
     completerId: row.completion.userId,

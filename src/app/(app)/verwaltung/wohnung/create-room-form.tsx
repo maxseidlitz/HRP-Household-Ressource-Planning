@@ -7,7 +7,7 @@ import {
   type RoomType,
 } from "@/catalog/rooms";
 import { FormMessage } from "@/components/form-state";
-import { Button, Field } from "@/components/ui";
+import { Button, Field, inputClass } from "@/components/ui";
 import { createRoomAction } from "@/server/actions/rooms";
 
 export function CreateRoomForm({
@@ -62,11 +62,7 @@ export function CreateRoomForm({
       {type === "bedroom" && (
         <label className="flex flex-col gap-1 text-sm font-medium">
           Privates Zimmer von
-          <select
-            name="privateOwnerId"
-            className="rounded-xl border border-black/10 bg-white/70 px-3 py-2.5 text-base font-normal outline-none focus:border-sage focus:ring-4 focus:ring-sage/15"
-            defaultValue=""
-          >
+          <select name="privateOwnerId" className={inputClass} defaultValue="">
             <option value="">— niemandem (Gemeinschaftsraum) —</option>
             {members.map((m) => (
               <option key={m.id} value={m.id}>

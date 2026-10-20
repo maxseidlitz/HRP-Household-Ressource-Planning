@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { parseAvatar } from "@/catalog/avatar";
 import { Avatar } from "@/components/avatar";
-import { Card } from "@/components/ui";
+import { Card, segmentClass, segmentTrack } from "@/components/ui";
 import { relativeTime } from "@/domain/time";
 import { requireAdmin } from "@/server/context";
 import { track } from "@/server/queries/analytics";
@@ -152,14 +152,14 @@ export default async function StatsPage({
         <h1 className="text-2xl font-bold">Statistik</h1>
         <nav
           aria-label="Zeitraum"
-          className="flex rounded-full bg-black/[0.06] p-0.5 text-sm font-semibold"
+          className={`flex ${segmentTrack} text-sm font-semibold`}
         >
           {STAT_RANGES.map((r) => (
             <Link
               key={r}
               href={`/verwaltung/statistik?tage=${r}`}
               aria-current={r === days ? "page" : undefined}
-              className={`rounded-full px-2.5 py-1 ${r === days ? "bg-white text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]" : "text-ink/60"}`}
+              className={`px-2.5 py-1 ${segmentClass(r === days)}`}
             >
               {r} T
             </Link>

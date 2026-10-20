@@ -1,13 +1,6 @@
 import { and, eq, gt, inArray, lte } from "drizzle-orm";
 import type { DB } from "@/db/client";
-import {
-  absence,
-  commitment,
-  household,
-  membership,
-  task,
-  user,
-} from "@/db/schema";
+import { absence, commitment, household, task, user } from "@/db/schema";
 import {
   formatDate,
   localDateKey,
@@ -15,6 +8,7 @@ import {
   zonedStartOfNextDay,
 } from "@/domain/time";
 import { awayUserIds } from "../queries/absences";
+import { memberIds } from "../queries/members";
 import { notify, notifyHousehold } from "../queries/notifications";
 import { getTaskView, listTaskViews } from "../queries/tasks";
 
@@ -29,12 +23,7 @@ const SUMMARY_HOUR = 9;
  */
 export function runNotificationJobs(db: DB, now: Date) {
   for (const h of db.select().from(household).all()) {
-    const members = db
-      .select({ userId: membership.userId })
-      .from(membership)
-      .where(eq(membership.householdId, h.id))
-      .all()
-      .map((m) => m.userId);
+    const members = memberIds(db, h.id);
     if (members.length === 0) continue;
     const away = awayUserIds(db, members, now);
     const local = zonedParts(now, h.timezone);

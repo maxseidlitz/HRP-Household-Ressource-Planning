@@ -3,6 +3,7 @@ import type { DB } from "@/db/client";
 import { household, membership, room, user } from "@/db/schema";
 import { parseSettings } from "@/domain/settings";
 import { assert } from "../errors";
+import { getMembership, requireAdminMembership } from "./members";
 import { clearRoomContents } from "./rooms";
 
 export type Role = "admin" | "member";
@@ -53,19 +54,6 @@ export function listHouseholdsOf(db: DB, userId: string) {
     .all();
 }
 
-export function getMembership(db: DB, householdId: string, userId: string) {
-  return db
-    .select()
-    .from(membership)
-    .where(
-      and(
-        eq(membership.householdId, householdId),
-        eq(membership.userId, userId),
-      ),
-    )
-    .get();
-}
-
 export function getHousehold(db: DB, householdId: string) {
   const h = db
     .select()
@@ -114,8 +102,12 @@ export function setRole(
 ) {
   const h = getHousehold(db, input.householdId);
   assert(h, "WG nicht gefunden.");
-  const actor = getMembership(db, input.householdId, input.actorId);
-  assert(actor?.role === "admin", "Nur Admins dürfen Rollen ändern.");
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen Rollen ändern.",
+  );
   const target = getMembership(db, input.householdId, input.targetId);
   assert(target, "Diese Person ist kein Mitglied.");
   if (

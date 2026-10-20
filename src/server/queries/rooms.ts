@@ -9,10 +9,10 @@ import {
 import type { RoomType } from "@/catalog/rooms";
 import { initialBaseline, type LastDone } from "@/domain/progress";
 import { assert } from "../errors";
-import { getMembership } from "./households";
+import { getMembership } from "./members";
+import { requireAdminMembership } from "./members";
 
 /** Transaktion oder Datenbank: beide haben dieselbe Query-API. */
-type Tx = Pick<DB, "select" | "insert" | "update" | "delete">;
 
 /**
  * Sichtbarkeit (Spez. 4.2): Gemeinschaftsräume für alle, private Zimmer nur
@@ -76,8 +76,12 @@ export function createRoom(
     privateOwnerId?: string | null;
   },
 ) {
-  const actor = getMembership(db, input.householdId, input.actorId);
-  assert(actor?.role === "admin", "Nur Admins dürfen Räume anlegen.");
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen Räume anlegen.",
+  );
   if (input.privateOwnerId) {
     assert(
       getMembership(db, input.householdId, input.privateOwnerId),
@@ -100,7 +104,7 @@ export function createRoom(
   });
 }
 
-function insertFloor(tx: Tx, r: RoomRow) {
+function insertFloor(tx: DB, r: RoomRow) {
   tx.insert(householdObject)
     .values({
       householdId: r.householdId,
@@ -115,7 +119,7 @@ function insertFloor(tx: Tx, r: RoomRow) {
 }
 
 /** Entfernt alle Objekte und Aufgaben eines Raums, der Boden wird neu angelegt. */
-export function clearRoomContents(tx: Tx, roomId: string) {
+export function clearRoomContents(tx: DB, roomId: string) {
   const r = tx.select().from(room).where(eq(room.id, roomId)).get();
   if (!r) return;
   tx.delete(householdObject).where(eq(householdObject.roomId, roomId)).run();
@@ -131,8 +135,12 @@ export function assignRoom(
     privateOwnerId: string | null;
   },
 ) {
-  const actor = getMembership(db, input.householdId, input.actorId);
-  assert(actor?.role === "admin", "Nur Admins dürfen Zimmer zuweisen.");
+  requireAdminMembership(
+    db,
+    input.householdId,
+    input.actorId,
+    "Nur Admins dürfen Zimmer zuweisen.",
+  );
   const r = db
     .select()
     .from(room)

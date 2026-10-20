@@ -1,9 +1,10 @@
 "use client";
 
-import { startTransition, useActionState, useState } from "react";
+import { useActionState, useState } from "react";
 import { createCommitmentAction } from "@/server/actions/planning";
+import { submitWithoutReset } from "./form-hooks";
 import { FormMessage } from "./form-state";
-import { Button } from "./ui";
+import { Button, inputClass } from "./ui";
 
 /**
  * „Ich mach das“ mit Termin (Spez. 5.6). Uhrzeit in der Zeitzone der WG,
@@ -27,15 +28,7 @@ export function CommitmentForm({
   const [state, action, pending] = useActionState(createCommitmentAction, null);
 
   return (
-    <form
-      onSubmit={(e) => {
-        // Ohne automatisches Zurücksetzen, damit die Eingabe bei Fehlern bleibt.
-        e.preventDefault();
-        const fd = new FormData(e.currentTarget);
-        startTransition(() => action(fd));
-      }}
-      className="flex flex-col gap-2"
-    >
+    <form onSubmit={submitWithoutReset(action)} className="flex flex-col gap-2">
       <input type="hidden" name="taskId" value={taskId} />
       <div
         className="flex flex-wrap gap-1.5"
@@ -63,7 +56,7 @@ export function CommitmentForm({
           min={min}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="rounded-xl border border-black/10 bg-white/70 px-3.5 py-2.5 text-base font-normal outline-none transition focus:border-sage focus:bg-white focus:ring-4 focus:ring-sage/15"
+          className={inputClass}
         />
       </label>
       <Button disabled={pending}>

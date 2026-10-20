@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getDb } from "@/db";
 import { Card } from "@/components/ui";
 import { getSession } from "@/lib/auth";
-import { getMembership } from "@/server/queries/households";
+import { getMembership } from "@/server/queries/members";
 import { lookupInvite } from "@/server/queries/invites";
 import { InviteJoin } from "./invite-join";
 

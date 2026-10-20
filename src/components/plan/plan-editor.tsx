@@ -1,5 +1,6 @@
 "use client";
 
+import { segmentTrack, segmentClass } from "../ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState, useTransition } from "react";
@@ -289,7 +290,7 @@ export function PlanEditor({
       <div
         role="tablist"
         aria-label="Bearbeiten"
-        className="grid grid-cols-3 rounded-full bg-black/[0.06] p-0.5 text-sm"
+        className={`grid grid-cols-3 ${segmentTrack} text-sm`}
       >
         {(
           [
@@ -308,7 +309,7 @@ export function PlanEditor({
               setMode(m);
               setError(null);
             }}
-            className={`rounded-full py-1.5 font-semibold disabled:opacity-40 ${mode === m ? "bg-white text-ink shadow-[0_1px_4px_rgb(0_0_0/0.12)]" : "text-ink/60"}`}
+            className={`py-1.5 font-semibold disabled:opacity-40 ${segmentClass(mode === m)}`}
           >
             {label}
           </button>
