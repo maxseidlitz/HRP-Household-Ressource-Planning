@@ -46,6 +46,9 @@ test("Sicherer Kontext: Service Worker, Push-Schalter und offline", async ({
   page,
   context,
 }) => {
+  // Headless-Chromium verweigert Mitteilungen standardmäßig; hier wie nach
+  // einem „Erlauben“ des Nutzers.
+  await context.grantPermissions(["notifications"], { origin: secureBase });
   await page.goto(`${secureBase}/registrieren`);
   await register(page, { name: "Max", username: uniq("max") });
   await createHousehold(page, "WG Sicher", 1);

@@ -24,7 +24,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - name: Playwright-Browser installieren
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps --no-shell chromium
       - name: E2E gegen den Standalone-Server (http, Nicht-localhost-IP)
         run: scripts/with-server.sh npm run e2e
       - uses: actions/upload-artifact@v4
