@@ -8,6 +8,7 @@ describe("parseEnv", () => {
       ALLOWED_HOSTS: ["*"],
       APP_PROTOCOL: "http",
       AUTH_RATE_LIMIT: "on",
+      VAPID_SUBJECT: "mailto:hrp@example.com",
     });
   });
 
@@ -21,6 +22,13 @@ describe("parseEnv", () => {
       "zimaboard.local:3000",
     ]);
     expect(env.BETTER_AUTH_URL).toBeUndefined();
+  });
+
+  it("verlangt für Web Push einen mailto:- oder https-Kontakt", () => {
+    expect(
+      parseEnv({ VAPID_SUBJECT: "mailto:wg@example.de" }).VAPID_SUBJECT,
+    ).toBe("mailto:wg@example.de");
+    expect(() => parseEnv({ VAPID_SUBJECT: "wg@example.de" })).toThrow();
   });
 
   it("lehnt zu kurze Secrets ab", () => {

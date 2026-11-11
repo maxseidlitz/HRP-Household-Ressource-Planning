@@ -441,9 +441,31 @@ export const notification = sqliteTable(
     /** Verhindert, dass der Scheduler dieselbe Meldung mehrfach erzeugt. */
     dedupeKey: text("dedupe_key").unique(),
     readAt: timestamp("read_at"),
+    /** Per Web Push zugestellt (oder bewusst übersprungen), Spez. 8 v2. */
+    pushedAt: timestamp("pushed_at"),
     createdAt: createdAt(),
   },
-  (t) => [index("notification_user_idx").on(t.userId, t.readAt)],
+  (t) => [
+    index("notification_user_idx").on(t.userId, t.readAt),
+    index("notification_push_idx").on(t.pushedAt),
+  ],
+);
+
+/** Web-Push-Abos je Gerät (Phase 5). */
+export const pushSubscription = sqliteTable(
+  "push_subscription",
+  {
+    id: id(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull().unique(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    userAgent: text("user_agent"),
+    createdAt: createdAt(),
+  },
+  (t) => [index("push_subscription_user_idx").on(t.userId)],
 );
 
 export const feedbackTicket = sqliteTable("feedback_ticket", {

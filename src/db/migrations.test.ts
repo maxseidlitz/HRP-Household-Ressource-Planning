@@ -35,6 +35,7 @@ describe("Migrationen", () => {
         "objection",
         "objection_vote",
         "password_reset",
+        "push_subscription",
         "room",
         "session",
         "task",

@@ -1,0 +1,36 @@
+# WG-App mit eigener Domain und HTTPS (Phase 5).
+#
+#   cp .env.example .env   # DOMAIN usw. eintragen
+#   docker compose up -d
+#
+# Danach: https://<DOMAIN>. Die App selbst ist nur noch über Caddy erreichbar.
+name: hrp
+
+services:
+  app:
+    image: ghcr.io/maxseidlitz/hrp-household-ressource-planning:latest
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Berlin
+      APP_PROTOCOL: https
+      BETTER_AUTH_URL: https://${DOMAIN:?DOMAIN in .env setzen}
+      ALLOWED_HOSTS: ${DOMAIN}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:hrp@example.com}
+    volumes:
+      - ${DATA_PATH:-/DATA/AppData/hrp}:/data
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${CADDY_PATH:-/DATA/AppData/hrp-caddy}/data:/data
+      - ${CADDY_PATH:-/DATA/AppData/hrp-caddy}/config:/config

@@ -32,6 +32,9 @@ npm run dev
 # → http://localhost:3000
 ```
 
+**Mit eigener Domain und HTTPS** (für Push-Nachrichten und App-Installation):
+siehe [Umzug auf eine eigene Domain](#-umzug-auf-eine-eigene-domain-https).
+
 Alle Daten liegen in einem Ordner (auf ZimaOS `/DATA/AppData/hrp`): SQLite-Datei,
 Auth-Schlüssel, Feedback-Screenshots und Backups. Diesen Ordner sichern, mehr
 braucht es nicht.
@@ -62,7 +65,11 @@ braucht es nicht.
 | :--------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
 | <img src="docs/screenshots/03-raum.png" width="240" alt="Objekt mit Aufgabenvorschlägen hinzufügen"> | <img src="docs/screenshots/08-profil.png" width="240" alt="Avatar-Editor"> | <img src="docs/screenshots/02-wg-erstellen.png" width="240" alt="WG erstellen"> |
 
-> Stand: Phase 4 im Liquid-Glass-Design. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
+|                                           Push & App installieren                                            |
+| :----------------------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/19-push.png" width="240" alt="Push-Nachrichten einschalten und App installieren"> |
+
+> Stand: Phase 5 im Liquid-Glass-Design. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
 > (`npm run screenshots`).
 
 ## ✨ Funktionen
@@ -79,7 +86,7 @@ braucht es nicht.
 | ⏰  | Einplanen mit Wecker-Icon, Kalender-Export (.ics mit Erinnerung), Mitteilungen mit Badge, Urlaub mit Urlaubspaket und Koffer-Avatar                | ✅ Phase 3  |
 | 📊  | Admin-Statistiken, Feedback-Tickets mit Screenshot, Einstellungen, JSON-Export, Widerspruch per Abstimmung                                         | ✅ Phase 4  |
 | 🪟  | Modernes Liquid-Glass-Design: Glasflächen, schwebende Tab-Leiste, Linien-Icons                                                                     | ✅          |
-| 🔔  | HTTPS, PWA-Installation, Push-Benachrichtigungen                                                                                                   | Phase 5     |
+| 🔔  | Eigene Domain mit HTTPS (Caddy), Installation als App (PWA), Push-Benachrichtigungen, Offline-Hinweis                                              | ✅ Phase 5  |
 
 Details: [Spezifikation](docs/SPEC.md) · [Umsetzungsplan](docs/PLAN.md)
 
@@ -87,23 +94,25 @@ Details: [Spezifikation](docs/SPEC.md) · [Umsetzungsplan](docs/PLAN.md)
 
 Ohne Konfiguration lauffähig. Optional per Umgebungsvariable:
 
-| Variable             | Standard | Bedeutung                                                                                                           |
-| -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
-| `DATA_DIR`           | `/data`  | Datenverzeichnis im Container                                                                                       |
-| `ALLOWED_HOSTS`      | `*`      | Kommagetrennte Hosts (mit Port), unter denen die App erreichbar ist, z. B. `192.168.1.20:3000,zimaboard.local:3000` |
-| `APP_PROTOCOL`       | `http`   | `https`, sobald die App hinter einem TLS-Proxy läuft                                                                |
-| `BETTER_AUTH_URL`    | –        | Feste Basis-URL statt Ableitung aus dem Host                                                                        |
-| `BETTER_AUTH_SECRET` | –        | Eigener Schlüssel; sonst wird beim ersten Start einer erzeugt                                                       |
-| `AUTH_RATE_LIMIT`    | `on`     | Schutz gegen Passwort-Raten (3 Logins pro 10 s und Gerät). Nur für automatisierte Tests auf `off`                   |
+| Variable                                 | Standard                 | Bedeutung                                                                                                           |
+| ---------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `DATA_DIR`                               | `/data`                  | Datenverzeichnis im Container                                                                                       |
+| `ALLOWED_HOSTS`                          | `*`                      | Kommagetrennte Hosts (mit Port), unter denen die App erreichbar ist, z. B. `192.168.1.20:3000,zimaboard.local:3000` |
+| `APP_PROTOCOL`                           | `http`                   | `https`, sobald die App hinter einem TLS-Proxy läuft                                                                |
+| `BETTER_AUTH_URL`                        | –                        | Feste Basis-URL statt Ableitung aus dem Host                                                                        |
+| `BETTER_AUTH_SECRET`                     | –                        | Eigener Schlüssel; sonst wird beim ersten Start einer erzeugt                                                       |
+| `AUTH_RATE_LIMIT`                        | `on`                     | Schutz gegen Passwort-Raten (3 Logins pro 10 s und Gerät). Nur für automatisierte Tests auf `off`                   |
+| `VAPID_SUBJECT`                          | `mailto:hrp@example.com` | Kontakt für die Push-Dienste von Apple, Google und Mozilla (`mailto:` oder `https://`)                              |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | –                        | Eigene Push-Schlüssel; sonst wird beim ersten Start ein Paar im Datenordner erzeugt                                 |
 
 **Backups:** Die App legt täglich eine Kopie der Datenbank unter `backups/` im
 Datenordner an und behält 14 Tage.
 
 **Mitteilungen:** Die App prüft alle fünf Minuten, ob Eingeplantes heute
 ansteht, verpasst wurde oder überfällig ist (Sammelmeldung ab 9 Uhr), und
-die Glocke aktualisiert sich alle 30 Sekunden. Push-Benachrichtigungen kommen
-mit HTTPS in Phase 5; bis dahin erinnert der Kalendereintrag (.ics) zwei
-Stunden vorher.
+die Glocke aktualisiert sich alle 30 Sekunden. Mit HTTPS kommen alle
+Mitteilungen zusätzlich als Push-Nachricht aufs Handy (im Profil unter „Auf
+diesem Gerät“ einschalten); ohne HTTPS erinnert der Kalendereintrag (.ics).
 
 ### Fertiges Image statt selbst bauen
 
@@ -112,6 +121,45 @@ Bei jedem Push auf `main` baut die CI das Image
 GitHub privat, auf dem ZimaBoard einmalig `docker login ghcr.io` mit einem
 Personal Access Token (Scope `read:packages`) ausführen oder das Paket in den
 GitHub-Einstellungen öffentlich schalten.
+
+## 🔒 Umzug auf eine eigene Domain (HTTPS)
+
+Browser erlauben Push-Nachrichten, App-Installation und den Offline-Modus nur
+über HTTPS. Dafür gibt es eine zweite Compose-Datei mit [Caddy](https://caddyserver.com),
+der das Zertifikat von Let's Encrypt automatisch holt und erneuert:
+[`deploy/https/`](deploy/https).
+
+1. **Domain:** Eine (Sub-)Domain, z. B. `wg.example.de`, per DNS (A/AAAA) auf die
+   öffentliche IP eures Anschlusses zeigen lassen. Bei wechselnder IP einen
+   DynDNS-Dienst nutzen (z. B. über den Router, bei der Fritz!Box „MyFRITZ!“
+   oder „DynDNS“).
+2. **Router:** Ports 80 und 443 (TCP, für HTTP/3 auch 443 UDP) an das ZimaBoard
+   weiterleiten. ZimaOS belegt selbst Port 80: dann in der `.env`
+   `HTTP_PORT=8080` und `HTTPS_PORT=8443` setzen und im Router 80 → 8080 und
+   443 → 8443 weiterleiten.
+3. **Starten:**
+
+   ```bash
+   cd deploy/https
+   cp .env.example .env   # DOMAIN und VAPID_SUBJECT eintragen
+   docker compose up -d
+   # → https://wg.example.de
+   ```
+
+   Auf ZimaOS stattdessen die bisherige App stoppen und den Inhalt von
+   [`deploy/https/docker-compose.yml`](deploy/https/docker-compose.yml) als
+   Custom App importieren (Variablen dort eintragen; die `Caddyfile` muss neben
+   der Compose-Datei liegen).
+
+4. **Am Handy:** `https://<domain>` öffnen und einloggen. Die Daten bleiben
+   erhalten, es ist derselbe Datenordner. Unter **Profil → Auf diesem Gerät**
+   Push einschalten. Auf dem iPhone die App vorher über Teilen → „Zum
+   Home-Bildschirm“ installieren (iOS 16.4+), sonst bietet Safari kein Push an.
+
+Die App ist danach nur noch über die Domain erreichbar, nicht mehr über
+`http://<ip>:3000` (Logins sind an die HTTPS-Adresse gebunden). Im Heimnetz
+funktioniert die Domain ebenfalls, sofern der Router „NAT-Loopback“ kann (die
+Fritz!Box kann das).
 
 ## 🛠️ Entwicklung
 
@@ -124,6 +172,7 @@ GitHub-Einstellungen öffentlich schalten.
 | `npm run e2e:local`   | Build + E2E-Tests (Playwright) gegen einen frischen Server |
 | `npm run e2e`         | E2E-Tests gegen einen laufenden Server (`E2E_BASE_URL`)    |
 | `npm run screenshots` | README-Screenshots neu erzeugen (frischer Build, leere DB) |
+| `npm run icons`       | App-Icons (PNG) aus `src/app/icon.svg` erzeugen            |
 | `npm run format`      | Prettier                                                   |
 | `npm run db:generate` | Neue Migration aus `src/db/schema.ts` erzeugen             |
 

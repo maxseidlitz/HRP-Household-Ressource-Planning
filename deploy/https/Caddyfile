@@ -1,0 +1,17 @@
+# HTTPS für die WG-App (Phase 5). Caddy holt und erneuert das Zertifikat
+# von Let's Encrypt selbst; DOMAIN kommt aus der .env-Datei.
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Der Service Worker muss immer frisch geladen werden.
+	header /sw.js Cache-Control "no-cache"
+
+	reverse_proxy app:3000
+}
