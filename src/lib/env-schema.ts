@@ -26,6 +26,17 @@ const schema = z.object({
    * automatisierte Tests abschalten, die alle von derselben IP kommen.
    */
   AUTH_RATE_LIMIT: z.enum(["on", "off"]).default("on"),
+  /**
+   * Web Push (Phase 5). Ohne Schlüssel erzeugt die App beim ersten Start ein
+   * Paar im Datenordner. Der Kontakt (mailto: oder https:) wird an die
+   * Push-Dienste von Apple, Google und Mozilla übermittelt.
+   */
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z
+    .string()
+    .regex(/^(mailto:|https:\/\/)/, "mailto:… oder https://…")
+    .default("mailto:hrp@example.com"),
 });
 
 export type Env = z.infer<typeof schema>;

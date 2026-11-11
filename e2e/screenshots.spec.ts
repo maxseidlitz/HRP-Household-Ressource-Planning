@@ -400,4 +400,22 @@ test("README-Screenshots", async ({ browser }) => {
   await max.goto("/verwaltung/statistik?tage=7");
   await expect(max.getByTestId("kpis")).toBeVisible();
   await shot(max, "17-statistik");
+
+  // Push & App-Installation (localhost gilt wie HTTPS als sicherer Kontext)
+  const port = new URL(process.env.E2E_BASE_URL!).port;
+  const secure = await (await browser.newContext()).newPage();
+  await secure.goto(`http://localhost:${port}/login`);
+  await secure.getByLabel("Benutzername oder E-Mail").fill("max");
+  await secure.getByLabel("Passwort").fill("geheim1234");
+  await secure.getByRole("button", { name: "Anmelden" }).click();
+  await expect(secure).toHaveURL(/\/(wohnung|aufgaben)/);
+  await secure.goto(`http://localhost:${port}/profil`);
+  const device = secure.getByTestId("device-settings");
+  await expect(
+    device.getByRole("button", { name: "Push einschalten" }),
+  ).toBeVisible();
+  await device.evaluate((el) => {
+    window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 140);
+  });
+  await shot(secure, "19-push");
 });

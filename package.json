@@ -14,7 +14,8 @@
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
     "screenshots": "scripts/screenshots.sh",
-    "e2e:local": "npm run build && scripts/with-server.sh playwright test"
+    "e2e:local": "npm run build && scripts/with-server.sh playwright test",
+    "icons": "node scripts/icons.mjs"
   },
   "dependencies": {
     "better-auth": "^1.7.10",
@@ -26,6 +27,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",
+    "web-push": "^3.6.7",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -36,6 +38,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/web-push": "^3.6.4",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",

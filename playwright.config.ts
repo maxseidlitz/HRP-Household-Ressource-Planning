@@ -28,6 +28,9 @@ export default defineConfig({
       use: {
         ...devices["iPhone 13"],
         browserName: "chromium",
+        // Volles Chromium statt der schlanken Headless-Shell: Nur dort lassen
+        // sich Mitteilungen erlauben (Push-Test, Phase 5).
+        channel: "chromium",
         locale: "de-DE",
         timezoneId: "Europe/Berlin",
       },

@@ -3,10 +3,12 @@ import { and, eq, isNull } from "drizzle-orm";
 import { parseAvatar } from "@/catalog/avatar";
 import { ROOM_TYPE_EMOJI } from "@/catalog/rooms";
 import { room } from "@/db/schema";
+import { DeviceSettings } from "@/components/device-settings";
 import { LogoutButton } from "@/components/logout-button";
 import { Card } from "@/components/ui";
 import { isPlaceholderEmail } from "@/lib/placeholder-email";
 import { requireHousehold } from "@/server/context";
+import { vapidPublicKey } from "@/server/push-sender";
 import { LeaveHouseholdForm, ProfileForm } from "./profile-form";
 
 export default async function ProfilePage() {
@@ -35,6 +37,11 @@ export default async function ProfilePage() {
           name={ctx.user.name}
           avatar={parseAvatar(ctx.user.avatarJson, ctx.user.id)}
         />
+      </Card>
+
+      <Card className="flex flex-col gap-3">
+        <h2 className="font-bold">Auf diesem Gerät</h2>
+        <DeviceSettings vapidKey={vapidPublicKey()} />
       </Card>
 
       {myRooms.length > 0 && (
