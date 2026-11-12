@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   addObject,
   clickPlan,
@@ -6,11 +6,19 @@ import {
   createInviteLink,
   createRoom,
   dragRect,
+  planPoint,
   register,
   uniq,
+  waitSaved,
 } from "./helpers";
 
-test("Grundriss zeichnen, Tür setzen, Möbel platzieren, Plan mit Statusfarben", async ({
+const objects = (page: Page) =>
+  page.locator('[data-testid="plan-editor"] [data-object]');
+const doors = (page: Page) =>
+  page.locator('[data-testid="plan-editor"] [data-door]');
+const toast = (page: Page) => page.getByTestId("build-toast");
+
+test("Baumodus: Räume aufziehen, Türen, Möbel ziehen, rückgängig, Plan", async ({
   browser,
 }) => {
   const page = await (await browser.newContext()).newPage();
@@ -18,104 +26,115 @@ test("Grundriss zeichnen, Tür setzen, Möbel platzieren, Plan mit Statusfarben"
   await register(page, { name: "Max", username: uniq("max") });
   await createHousehold(page, "WG Plan", 2);
 
-  await createRoom(page, { type: "Küche", name: "Küche" });
-  await addObject(page, "fridge", "vor ein paar Tagen");
-  await addObject(page, "stove", "heute");
-  await createRoom(page, { type: "Bad", name: "Bad" });
+  // Küche aufziehen (8 × 6 Kästchen = 4 × 3 m)
+  await page.getByTestId("room-card-kitchen").click();
+  await dragRect(page, [3, 3], [10, 8]);
+  await expect(page.getByTestId("room-sheet")).toContainText("12 m²");
+  await waitSaved(page);
 
-  // Startseite ohne Grundriss
-  await page.goto("/wohnung");
-  await expect(page.getByText("Noch kein Grundriss gezeichnet.")).toBeVisible();
-  await page.getByRole("link", { name: "Grundriss zeichnen →" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Plan bearbeiten" }),
-  ).toBeVisible();
+  // Bad darf die Küche nicht überlappen …
+  await page.getByTestId("room-card-bath").click();
+  await dragRect(page, [9, 3], [12, 6]);
+  await expect(toast(page)).toContainText("Überschneidet sich");
+  await expect(page.locator("[data-room]")).toHaveCount(1);
+  // … daneben passt es, die Tür setzt sich selbst
+  await dragRect(page, [11, 3], [14, 8]);
+  await expect(page.locator("[data-room]")).toHaveCount(2);
+  await expect(doors(page)).toHaveCount(2); // auf beiden Seiten der Wand
+  await waitSaved(page);
 
-  // Küche als L-Form aus zwei Rechtecken
-  await page.getByRole("button", { name: /Küche · leer/ }).click();
-  await dragRect(page, [5, 5], [8, 7]);
-  await expect(page.getByRole("button", { name: /Küche · leer/ })).toHaveCount(
-    0,
-  );
-  await dragRect(page, [5, 8], [6, 9]);
-  await expect(page.getByText("Speichern …")).toHaveCount(0);
+  // Zweite Tür per Antippen der Wand, und wieder weg
+  await clickPlan(page, 11.05, 3.5);
+  await expect(toast(page)).toContainText("Tür gesetzt");
+  await expect(doors(page)).toHaveCount(4);
+  await clickPlan(page, 11.05, 3.5);
+  await expect(toast(page)).toContainText("Tür entfernt");
+  await expect(doors(page)).toHaveCount(2);
 
-  // Bad darf die Küche nicht überlappen
-  await page.getByRole("button", { name: /Bad · leer/ }).click();
-  await dragRect(page, [8, 7], [10, 9]);
-  await expect(page.locator("p[role=alert]")).toContainText("überschneidet");
-  await dragRect(page, [9, 5], [11, 7]);
-  await expect(page.getByRole("button", { name: /Bad · leer/ })).toHaveCount(0);
-
-  // Tür auf der Nordwand der Küche
-  await page.getByRole("button", { name: /Küche/ }).first().click();
-  await page.getByRole("tab", { name: "Türen" }).click();
-  await clickPlan(page, 6.5, 5.05);
-  await expect(page.locator("p[role=alert]")).toHaveCount(0);
-
-  // Kühlschrank platzieren und drehen
+  // Küche auswählen, Küchenzeile antippen: drei einzelne Teile
+  await clickPlan(page, 6.5, 6.5);
   await page.getByRole("tab", { name: "Möbel" }).click();
-  await page.getByRole("button", { name: /Kühlschrank/ }).click();
-  await clickPlan(page, 5.5, 5.5);
-  await expect(
-    page.locator('[data-testid="plan-editor"] [data-object]').first(),
-  ).toBeVisible();
-  // Herd ragt aus dem Raum → Fehler
-  await page.getByRole("button", { name: /Herd/ }).click();
-  await clickPlan(page, 8.5, 5.5);
-  await expect(page.locator("p[role=alert]")).toContainText("ganz im Raum");
-  await clickPlan(page, 7.5, 5.5);
-  await expect(page.locator("p[role=alert]")).toHaveCount(0);
+  await page.getByTestId("card-kitchenette").click();
+  await expect(toast(page)).toContainText("Küchenzeile in Küche");
+  await expect(objects(page)).toHaveCount(3);
+  await expect(page.getByTestId("object-sheet")).toContainText("Küchenzeile");
 
-  // Einbauküche gruppieren
-  await page
-    .getByRole("checkbox", { name: "Kühlschrank für Gruppe auswählen" })
-    .check();
-  await page
-    .getByRole("checkbox", { name: "Herd für Gruppe auswählen" })
-    .check();
-  await page.getByRole("button", { name: "Gruppieren" }).click();
-  await expect(page.getByText(/Einbauküche \(2 Teile\)/)).toBeVisible();
+  // Pflanze aus der Leiste ins Bad ziehen
+  await page.getByRole("button", { name: "Alle", exact: true }).click();
+  const card = page.getByTestId("card-plant");
+  await card.scrollIntoViewIfNeeded();
+  const box = (await card.boundingBox())!;
+  const target = await planPoint(page, 13.5, 7.5, false);
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2, box.y - 30, { steps: 4 });
+  await page.mouse.move(target.x, target.y, { steps: 8 });
+  await page.mouse.up();
+  await expect(toast(page)).toContainText("Pflanze in Bad");
+  await expect(objects(page)).toHaveCount(4);
 
-  // Wohnung: Plan mit antippbaren Objekten
+  // Rückgängig und wiederholen
+  await page.getByRole("button", { name: "Rückgängig" }).click();
+  await expect(objects(page)).toHaveCount(3);
+  await page.getByRole("button", { name: "Wiederholen" }).click();
+  await expect(objects(page)).toHaveCount(4);
+
+  // Kühlschrank und Herd mit „Zuletzt gemacht“
+  await clickPlan(page, 6.5, 7.5);
+  await addObject(page, "fridge", "vor ein paar Tagen");
+  await waitSaved(page);
+
+  // Bad am Griff verbreitern: 4 × 6 → 6 × 6 Kästchen
+  await clickPlan(page, 12.5, 5.5);
+  const handle = page.getByTestId("handle-e");
+  const hb = (await handle.boundingBox())!;
+  const to = await planPoint(page, 17, 5.5, false);
+  await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x, to.y, { steps: 6 });
+  await page.mouse.up();
+  await expect(page.getByTestId("room-sheet")).toContainText("9 m²");
+  await waitSaved(page);
+
+  // Alles bleibt nach dem Neuladen erhalten
+  await page.reload();
+  await expect(page.locator("[data-room]")).toHaveCount(2);
+  await expect(objects(page)).toHaveCount(5);
+
+  // Wohnung: 3D-Diorama mit Objekten und eigenem Avatar
   await page.goto("/wohnung");
-  // 3D-Diorama startet mit Objekten und dem eigenen Avatar
   const iso = page.getByTestId("iso");
   await expect(iso).toHaveAttribute("data-ready", "true");
-  await expect(iso).toHaveAttribute("data-objects", "2");
+  await expect(iso).toHaveAttribute("data-objects", "5");
   await expect(iso).toHaveAttribute("data-avatars", "1");
-  await expect(
-    page.getByRole("region", { name: "Als Nächstes" }),
-  ).toBeVisible();
 
-  // Objekt über die barrierefreie Liste öffnen und erledigen: Der Avatar läuft
-  // hin, putzt, danach glitzert es.
+  // Objekt über die barrierefreie Liste öffnen und erledigen: Der Avatar
+  // läuft hin, putzt, danach glitzert es.
   await page
     .getByRole("button", { name: "Kühlschrank öffnen" })
     .dispatchEvent("click");
   const sheet = page.getByRole("region", { name: /Aufgaben: Kühlschrank/ });
-  await expect(sheet.getByText("Kühlschrank auswischen")).toBeVisible();
   await sheet
     .getByRole("button", { name: "Kühlschrank auswischen erledigt" })
     .click();
   await expect(iso).toHaveAttribute("data-last-celebration", /.+/, {
     timeout: 20_000,
   });
+  await expect(page.getByTestId("my-points")).toContainText("6");
 
   // 2D-Ansicht
   await page.getByRole("button", { name: "2D", exact: true }).click();
   const plan = page.getByTestId("plan");
-  await expect(plan).toBeVisible();
   await expect(plan.locator("[data-room]")).toHaveCount(2);
-  await expect(plan.locator("[data-door]")).toHaveCount(1);
   await plan.getByRole("button", { name: "Herd" }).click();
   await expect(
     page.getByRole("region", { name: /Aufgaben: Herd/ }),
   ).toBeVisible();
-  await expect(page.getByTestId("my-points")).toContainText("6");
 });
 
-test("Fremde private Zimmer erscheinen nur als Umriss", async ({ browser }) => {
+test("Private Zimmer: Besitzerin richtet ein, Admin sieht nur den Umriss", async ({
+  browser,
+}) => {
   const admin = await (await browser.newContext()).newPage();
   await admin.goto("/registrieren");
   await register(admin, { name: "Max", username: uniq("max") });
@@ -132,27 +151,33 @@ test("Fremde private Zimmer erscheinen nur als Umriss", async ({ browser }) => {
     name: "Annas Zimmer",
     owner: "Anna",
   });
-  await admin.goto("/plan/bearbeiten");
-  await dragRect(admin, [5, 5], [8, 8]);
-  await expect(admin.getByRole("tab", { name: "Möbel" })).toBeDisabled();
+  await createRoom(admin, { type: "Flur", name: "Flur" });
 
-  // Anna richtet ein und erweitert ihr Zimmer
+  // Anna: Baumodus nur fürs eigene Zimmer
   await anna.goto("/profil");
   await anna.getByRole("link", { name: "Annas Zimmer einrichten" }).click();
+  await expect(anna.getByTestId("build-mode")).toBeVisible();
   await addObject(anna, "plant");
-  await anna.getByRole("link", { name: /Im Plan bearbeiten/ }).click();
-  await dragRect(anna, [9, 5], [10, 6]);
-  await expect(anna.locator("p[role=alert]")).toHaveCount(0);
-  await anna.getByRole("tab", { name: "Möbel" }).click();
-  await anna.getByRole("button", { name: /Pflanze/ }).click();
-  await clickPlan(anna, 5.5, 5.5);
+  // eigenes Bad im Zimmer (Unterraum)
+  await anna.getByRole("tab", { name: "Räume" }).click();
+  await anna.getByTestId("room-card-bath").click();
+  await dragRect(anna, [5, 4], [7, 5]);
+  await expect(anna.locator("[data-room]")).toHaveCount(3);
+  await waitSaved(anna);
+  // Den Flur kann sie nicht verschieben (Umriss bauen nur Admins)
+  await clickPlan(anna, 10.5, 2.5);
+  await expect(anna.getByTestId("room-sheet")).not.toContainText("Löschen");
+
   await anna.goto("/wohnung");
   await anna.getByRole("button", { name: "2D", exact: true }).click();
   await expect(
     anna.getByTestId("plan").getByRole("button", { name: "Pflanze" }),
   ).toBeVisible();
 
-  // Max sieht nur den Umriss mit Schloss
+  // Max sieht nur den Umriss mit Schloss, auch im Baumodus
+  await admin.goto("/plan/bearbeiten");
+  await expect(objects(admin)).toHaveCount(0);
+  await expect(admin.locator("[data-room]")).toHaveCount(2);
   await admin.goto("/wohnung");
   await admin.getByRole("button", { name: "2D", exact: true }).click();
   const plan = admin.getByTestId("plan");

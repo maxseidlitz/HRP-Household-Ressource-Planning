@@ -25,23 +25,20 @@ test("WG anlegen, Aufgabe erledigen, einladen, Rangliste, privates Zimmer, Passw
   // --- Bad mit Toilette und Vorschlag „Klo putzen“ ---
   await createRoom(page, { type: "Bad", name: "Bad" });
   await addObject(page, "shower", "heute");
-  // Die Auswahl bleibt stehen und passt zum Button; die Aufgabenvorschläge
-  // sind wieder frisch.
-  await expect(page.getByRole("combobox", { name: "Objekt" })).toHaveValue(
-    "shower",
-  );
-  await expect(
-    page.getByRole("button", { name: /Dusche hinzufügen/ }),
-  ).toBeVisible();
   await addObject(page, "toilet");
+
+  // Aufgaben kommen automatisch mit, auch für den Boden („Bad wischen“)
+  await page.getByRole("link", { name: "Fertig" }).first().click();
+  await page.getByRole("link", { name: "Aufgaben" }).click();
   await expect(page.getByRole("link", { name: /Klo putzen/ })).toBeVisible();
-  // Boden im Bad hat den Vorschlag „Bad wischen“
-  await expect(page.getByRole("heading", { name: "Boden" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Bad wischen/ })).toBeVisible();
 
   // --- Aufgabenliste: bei 50 % Sweet Spot → 3 × 1,5 = 4,5 Punkte ---
   await page.getByRole("link", { name: "Aufgaben" }).click();
   await expect(page.getByRole("heading", { name: "Aufgaben" })).toBeVisible();
-  await expect(page.getByText("+4,5")).toBeVisible();
+  await expect(
+    page.getByRole("listitem").filter({ hasText: "Klo putzen" }),
+  ).toContainText("+4,5");
   await page.getByRole("button", { name: "Klo putzen erledigt" }).click();
   await expect(
     page.getByRole("status").filter({ hasText: "+4,5" }),
@@ -89,10 +86,8 @@ test("WG anlegen, Aufgabe erledigen, einladen, Rangliste, privates Zimmer, Passw
     name: "Annas Zimmer",
     owner: "Anna",
   });
-  await expect(page.getByText(/private Zimmer von Anna/)).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Objekt hinzufügen" }),
-  ).toHaveCount(0);
+  // Für den Admin ab jetzt nur noch Umriss
+  await expect(page.getByTestId("room-sheet")).toContainText("privat");
 
   await annaPage.getByRole("link", { name: "Profil" }).click();
   await annaPage.getByRole("link", { name: "Annas Zimmer einrichten" }).click();
@@ -144,6 +139,7 @@ test("Mitglieder sehen keinen Admin-Bereich", async ({ browser }) => {
   await register(member, { name: "Mitglied", username: uniq("mit") });
   await expect(member.getByRole("heading", { name: "Aufgaben" })).toBeVisible();
   await expect(member.getByRole("link", { name: "Admin" })).toHaveCount(0);
-  await member.goto("/verwaltung/wohnung");
-  await expect(member).toHaveURL(/\/aufgaben$/);
+  // Bauen dürfen nur Admins (und Besitzer:innen im eigenen Zimmer)
+  await member.goto("/plan/bearbeiten");
+  await expect(member).toHaveURL(/\/wohnung$/);
 });

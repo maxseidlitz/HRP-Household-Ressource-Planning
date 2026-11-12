@@ -20,7 +20,7 @@ import {
   zonedStartOfNextDay,
 } from "@/domain/time";
 import { cancelCommitmentAction } from "@/server/actions/planning";
-import { deleteTaskAction, setTaskActiveAction } from "@/server/actions/rooms";
+import { deleteTaskAction, setTaskActiveAction } from "@/server/actions/tasks";
 import { requireHousehold } from "@/server/context";
 import { canObject, objectionsByCompletion } from "@/server/queries/objections";
 import { getTaskView, taskHistory } from "@/server/queries/tasks";
@@ -248,7 +248,6 @@ export default async function TaskPage({
               </form>
               <form action={deleteTaskAction} className="flex-1">
                 <input type="hidden" name="taskId" value={t.id} />
-                <input type="hidden" name="roomId" value={t.roomId} />
                 <Button
                   variant="secondary"
                   className="w-full text-status-overdue"

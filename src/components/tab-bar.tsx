@@ -20,6 +20,8 @@ const TABS = [
 /** Schwebende Tab-Leiste aus Glas (Liquid Glass). */
 export function TabBar({ isAdmin }: { isAdmin: boolean }) {
   const pathname = usePathname();
+  // Im Baumodus braucht die Bau-Leiste den Platz; zurück geht es über „Fertig“.
+  if (pathname.startsWith("/plan/bearbeiten")) return null;
   const tabs = isAdmin
     ? [...TABS, { href: "/verwaltung", label: "Admin", Icon: GearIcon }]
     : TABS;

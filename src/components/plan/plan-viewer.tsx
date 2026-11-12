@@ -252,7 +252,7 @@ export function PlanViewer({
               Keine Aufgaben.{" "}
               {selectedRoom?.canEditContent && (
                 <Link
-                  href={`/raum/${selectedRoom.id}`}
+                  href={`/plan/bearbeiten?raum=${selectedRoom.id}`}
                   className="font-semibold underline"
                 >
                   Aufgabe anlegen

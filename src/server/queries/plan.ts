@@ -145,9 +145,10 @@ export function getPlan(
       privateOwnerId: r.privateOwnerId,
       foreign,
       ownerName: ownerName ?? null,
+      // Umrisse von Zimmern ändern nur Admins (Baumodus)
       canEditOutline: r.parentRoomId
         ? r.privateOwnerId === input.viewerId
-        : isAdmin || r.privateOwnerId === input.viewerId,
+        : isAdmin,
       canEditContent: canEditRoom(r, input.viewerId, isAdmin),
       floor:
         floorObj && floorTasks.length

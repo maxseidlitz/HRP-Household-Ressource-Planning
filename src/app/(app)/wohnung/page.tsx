@@ -28,7 +28,11 @@ export default async function ApartmentPage() {
     now,
   );
   const drawn = plan.rooms.some((r) => r.tiles.length > 0);
-  const canEditPlan = plan.rooms.some((r) => r.canEditOutline) || ctx.isAdmin;
+  // Admins bauen, Besitzer:innen privater Zimmer richten sie ein
+  const ownsRoom = plan.rooms.some(
+    (r) => !r.parentRoomId && r.privateOwnerId === ctx.user.id,
+  );
+  const canEditPlan = ctx.isAdmin || ownsRoom;
   const unplaced = plan.objects.filter(
     (o) =>
       !o.placed && plan.rooms.find((r) => r.id === o.roomId)?.canEditContent,
@@ -46,7 +50,7 @@ export default async function ApartmentPage() {
           <p className="mb-3 font-semibold">Noch kein Grundriss gezeichnet.</p>
           {ctx.isAdmin ? (
             <Link href="/plan/bearbeiten" className="font-semibold underline">
-              Grundriss zeichnen →
+              Wohnung bauen →
             </Link>
           ) : (
             <p className="text-sm text-ink/70">
@@ -72,7 +76,7 @@ export default async function ApartmentPage() {
             href="/plan/bearbeiten"
             className="rounded-full glass px-3 py-1 text-sm font-semibold"
           >
-            Bearbeiten
+            {ctx.isAdmin ? "Bauen" : "Zimmer einrichten"}
           </Link>
         )}
       </div>

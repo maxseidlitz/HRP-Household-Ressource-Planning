@@ -43,7 +43,7 @@ export async function createHouseholdAction(
   });
   if (result?.ok) {
     revalidatePath("/", "layout");
-    redirect("/verwaltung/wohnung?neu=1");
+    redirect("/plan/bearbeiten");
   }
   return result;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { updateTaskAction } from "@/server/actions/rooms";
+import { updateTaskAction } from "@/server/actions/tasks";
 import { FormMessage } from "./form-state";
 import { Button, Field } from "./ui";
 

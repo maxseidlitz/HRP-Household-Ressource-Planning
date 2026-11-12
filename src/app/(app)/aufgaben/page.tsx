@@ -111,11 +111,8 @@ export default async function TasksPage({
         <div className="rounded-2xl border border-dashed border-black/15 p-6 text-center">
           <p className="mb-3 font-semibold">Noch keine Aufgaben.</p>
           {ctx.isAdmin ? (
-            <Link
-              href="/verwaltung/wohnung"
-              className="font-semibold underline"
-            >
-              Räume und Aufgaben anlegen →
+            <Link href="/plan/bearbeiten" className="font-semibold underline">
+              Wohnung bauen →
             </Link>
           ) : (
             <p className="text-sm text-ink/70">
