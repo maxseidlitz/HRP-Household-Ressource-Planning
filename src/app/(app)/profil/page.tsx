@@ -51,7 +51,7 @@ export default async function ProfilePage() {
             {myRooms.map((r) => (
               <li key={r.id}>
                 <Link
-                  href={`/raum/${r.id}`}
+                  href={`/plan/bearbeiten?raum=${r.id}`}
                   className="flex items-center gap-3 rounded-xl glass p-3"
                 >
                   <span aria-hidden className="text-2xl">

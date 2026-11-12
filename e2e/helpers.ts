@@ -35,42 +35,101 @@ export async function createHousehold(page: Page, name: string, members = 2) {
   await page.getByLabel("Name der WG").fill(name);
   await page.getByLabel("Wie viele wohnen in der WG?").fill(String(members));
   await page.getByRole("button", { name: "WG erstellen" }).click();
-  await expect(page.getByRole("heading", { name: "Wohnung" })).toBeVisible();
+  // Neue WG startet im Baumodus mit der Frage nach einer Vorlage
+  await expect(
+    page.getByRole("heading", { name: "Wohnung bauen" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Leer starten und selbst zeichnen" })
+    .click();
 }
 
+const ROOM_TYPES: Record<string, string> = {
+  Küche: "kitchen",
+  Bad: "bath",
+  WC: "wc",
+  Flur: "hallway",
+  Wohnzimmer: "living",
+  Zimmer: "bedroom",
+  Balkon: "balcony",
+  Abstellraum: "storage",
+  Sonstiges: "other",
+};
+
+/** Baumodus öffnen (eine evtl. Vorlagen-Frage überspringen). */
+export async function openBuild(page: Page) {
+  if (!page.url().includes("/plan/bearbeiten"))
+    await page.goto("/plan/bearbeiten");
+  await expect(page.getByTestId("build-mode")).toBeVisible();
+  const skip = page.getByRole("button", {
+    name: "Leer starten und selbst zeichnen",
+  });
+  if (await skip.isVisible()) await skip.click();
+}
+
+export async function waitSaved(page: Page) {
+  await expect(page.getByTestId("save-status")).toHaveText("Gespeichert ✓", {
+    timeout: 10_000,
+  });
+}
+
+/**
+ * Raum im Baumodus aufziehen (8 × 6 Kästchen am ersten freien Platz),
+ * benennen und optional als privates Zimmer zuweisen.
+ */
 export async function createRoom(
   page: Page,
-  { type, name, owner }: { type: string; name: string; owner?: string },
+  {
+    type,
+    name,
+    owner,
+    size = [8, 6],
+  }: { type: string; name: string; owner?: string; size?: [number, number] },
 ) {
-  await page.goto("/verwaltung/wohnung");
-  const radio = page.getByRole("radio", { name: type, exact: true });
-  // Das Radio ist visuell versteckt, also das Label anklicken. Vor der
-  // Hydration gesetzte Auswahl kann React zurücksetzen: wiederholen.
-  await expect(async () => {
-    await page.locator("label", { has: radio }).click();
-    await expect(radio).toBeChecked({ timeout: 500 });
-  }).toPass();
-  await page.getByLabel("Name", { exact: true }).fill(name);
+  await openBuild(page);
+  await page.getByRole("tab", { name: "Räume" }).click();
+  await page.getByTestId(`room-card-${ROOM_TYPES[type] ?? type}`).click();
+  const spot = await page
+    .getByTestId("build-mode")
+    .getAttribute("data-free-spot");
+  const [x, y] = spot!.split(",").map(Number);
+  await dragRect(page, [x, y], [x + size[0] - 1, y + size[1] - 1]);
+  const sheet = page.getByTestId("room-sheet");
+  await expect(sheet).toBeVisible();
+  await sheet.getByLabel("Name des Raums").fill(name);
+  await sheet.getByLabel("Name des Raums").press("Enter");
   if (owner)
-    await page
-      .getByRole("combobox", { name: "Privates Zimmer von" })
-      .selectOption({ label: owner });
-  await page.getByRole("button", { name: "Raum anlegen" }).click();
-  await expect(page.getByRole("heading", { name })).toBeVisible();
+    await sheet.getByLabel("Privat für").selectOption({ label: owner });
+  await waitSaved(page);
 }
 
+/**
+ * Möbel aus der Leiste antippen: landet automatisch im ausgewählten Raum.
+ * Danach „Zuletzt gemacht?“ setzen, falls das Möbel Aufgaben hat.
+ */
 export async function addObject(
   page: Page,
   objectType: string,
-  lastDone = "vor ein paar Tagen",
+  lastDone:
+    "heute" | "vor ein paar Tagen" | "weiß nicht" = "vor ein paar Tagen",
 ) {
-  await page.getByRole("combobox", { name: "Objekt" }).selectOption(objectType);
-  const picker = page.locator("section", { hasText: "Objekt hinzufügen" });
-  const selects = picker.getByLabel("Zuletzt gemacht?");
-  for (const s of await selects.all())
-    await s.selectOption({ label: lastDone });
-  await picker.getByRole("button", { name: /hinzufügen$/ }).click();
-  await expect(picker.getByText("Hinzugefügt.")).toBeVisible();
+  await page.getByRole("tab", { name: "Möbel" }).click();
+  await page.getByRole("button", { name: "Alle", exact: true }).click();
+  await page.getByTestId(`card-${objectType}`).click();
+  const sheet = page.getByTestId("object-sheet");
+  await expect(sheet).toBeVisible();
+  await waitSaved(page);
+  const chip = sheet.getByRole("button", { name: lastDone, exact: true });
+  const hasTasks = await chip
+    .waitFor({ timeout: 3000 })
+    .then(() => true)
+    .catch(() => false);
+  if (hasTasks && lastDone !== "weiß nicht") {
+    await chip.click();
+    await expect(page.getByTestId("build-toast")).toContainText(
+      `Gespeichert: zuletzt ${lastDone}`,
+    );
+  }
 }
 
 export async function createInviteLink(page: Page): Promise<string> {

@@ -19,6 +19,7 @@ test("Einplanen mit .ics, Mitteilungen und Urlaubspaket", async ({
   await createHousehold(page, "WG Planung", 3);
   await createRoom(page, { type: "Küche", name: "Küche" });
   await addObject(page, "trash_rest");
+  await page.goto("/aufgaben");
 
   // --- Einplanen: Schnellwahl „Morgen 18 Uhr“ ---
   await page

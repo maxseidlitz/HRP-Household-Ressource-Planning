@@ -1,14 +1,7 @@
 import path from "node:path";
 import Database from "better-sqlite3";
 import { expect, test, type Page } from "@playwright/test";
-import {
-  addObject,
-  clickPlan,
-  createInviteLink,
-  createRoom,
-  dragRect,
-  register,
-} from "./helpers";
+import { clickPlan, createInviteLink, register, waitSaved } from "./helpers";
 
 // Erzeugt die Screenshots für die README (docs/screenshots).
 // Läuft nur mit `npm run screenshots` gegen eine leere Datenbank.
@@ -81,23 +74,6 @@ const day = (offset: number) =>
     timeZone: "Europe/Berlin",
   });
 
-async function selectRoom(page: Page, name: string) {
-  await page
-    .getByRole("navigation", { name: "Raum wählen" })
-    .getByRole("button", { name: new RegExp(name) })
-    .click();
-}
-
-async function placeAt(page: Page, objectName: RegExp, x: number, y: number) {
-  await page
-    .getByRole("region", { name: "Möbel im Raum" })
-    .getByRole("button", { name: objectName })
-    .click();
-  await clickPlan(page, x + 0.5, y + 0.5);
-  await expect(page.getByText("Speichern …")).toHaveCount(0);
-  await expect(page.locator("p[role=alert]")).toHaveCount(0);
-}
-
 test("README-Screenshots", async ({ browser }) => {
   const max = await (await browser.newContext()).newPage();
 
@@ -116,7 +92,10 @@ test("README-Screenshots", async ({ browser }) => {
   await shot(max, "02-wg-erstellen");
   await max.getByLabel("Wie viele wohnen in der WG?").fill("3");
   await max.getByRole("button", { name: "WG erstellen" }).click();
-  await expect(max.getByRole("heading", { name: "Wohnung" })).toBeVisible();
+  // Die Vorlage wählt Max erst, wenn alle eingezogen sind
+  await expect(
+    max.getByRole("dialog", { name: "Vorlage wählen" }),
+  ).toBeVisible();
   await chooseAvatar(max, [
     "Hautton 2",
     "Locken",
@@ -147,103 +126,38 @@ test("README-Screenshots", async ({ browser }) => {
     .click();
   await expect(max.getByTestId("objection-status")).toContainText("An");
 
-  // Räume, Objekte, Aufgaben
-  await createRoom(max, { type: "Küche", name: "Küche" });
-  for (const [obj, last] of [
-    ["fridge", "heute"],
-    ["stove", "vor ein paar Tagen"],
-    ["sink", "vor ein paar Tagen"],
-    ["trash_rest", "vor ein paar Tagen"],
-    ["trash_bio", "heute"],
-    ["dining_table", "heute"],
-  ] as const)
-    await addObject(max, obj, last);
-  await createRoom(max, { type: "Bad", name: "Bad" });
-  await addObject(max, "toilet", "vor ein paar Tagen");
-  await addObject(max, "shower", "heute");
-  await max.getByRole("combobox", { name: "Objekt" }).selectOption("washbasin");
-  await max
-    .getByRole("heading", { name: "Objekt hinzufügen" })
-    .evaluate((el) => {
-      window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 90);
-    });
-  await shot(max, "03-raum");
-  await addObject(max, "washbasin", "vor ein paar Tagen");
-  await createRoom(max, { type: "Flur", name: "Flur" });
-  await addObject(max, "shoe_rack", "heute");
-  await createRoom(max, { type: "Wohnzimmer", name: "Wohnzimmer" });
-  await addObject(max, "sofa", "heute");
-  await addObject(max, "plant", "vor ein paar Tagen");
-  await createRoom(max, {
-    type: "Zimmer",
-    name: "Annas Zimmer",
-    owner: "Anna",
-  });
-
-  // Grundriss zeichnen
+  // Baumodus: Vorlage „3er-WG“, Zimmer zuweisen
   await max.goto("/plan/bearbeiten");
-  const layout: [string, [number, number], [number, number]][] = [
-    ["Küche", [4, 4], [9, 8]],
-    ["Bad", [10, 4], [13, 8]],
-    ["Flur", [4, 9], [13, 10]],
-    ["Wohnzimmer", [4, 11], [9, 15]],
-    ["Annas Zimmer", [10, 11], [13, 15]],
-  ];
-  for (const [name, a, b] of layout) {
-    await selectRoom(max, name);
-    await dragRect(max, a, b);
-    await expect(max.getByText("Speichern …")).toHaveCount(0);
-  }
-  // Türen zum Flur
-  await max.getByRole("tab", { name: "Türen" }).click();
-  for (const [name, x, y] of [
-    ["Küche", 6.5, 8.95],
-    ["Bad", 11.5, 8.95],
-    ["Wohnzimmer", 6.5, 11.05],
-    ["Annas Zimmer", 11.5, 11.05],
+  await expect(
+    max.getByRole("dialog", { name: "Vorlage wählen" }),
+  ).toBeVisible();
+  await shot(max, "03-vorlage");
+  await max.getByRole("button", { name: /3er-WG/ }).click();
+  await waitSaved(max);
+  // Mittelpunkte der Zimmer in der Vorlage (Kästchen)
+  for (const [room, owner, x, y] of [
+    ["Zimmer 1", "Anna", 18, 5],
+    ["Zimmer 2", "Ben", 13.5, 15],
+    ["Zimmer 3", "Max", 18.5, 15],
   ] as const) {
-    await selectRoom(max, name);
-    if (name !== "Annas Zimmer")
-      await max.getByRole("tab", { name: "Türen" }).click();
     await clickPlan(max, x, y);
-    await expect(max.getByText("Speichern …")).toHaveCount(0);
+    const sheet = max.getByTestId("room-sheet");
+    await expect(sheet.getByLabel("Name des Raums")).toHaveValue(room);
+    await sheet
+      .getByLabel("Name des Raums")
+      .fill(owner === "Max" ? "Max’ Zimmer" : `${owner}s Zimmer`);
+    await sheet.getByLabel("Name des Raums").press("Enter");
+    await sheet.getByLabel("Privat für").selectOption({ label: owner });
+    await waitSaved(max);
+    // Blatt schließen, damit das nächste Zimmer frei antippbar ist
+    await max.getByRole("button", { name: "Auswahl aufheben" }).click();
   }
-
-  // Möbel
-  await selectRoom(max, "Küche");
+  // Baumodus mit ausgewählter Küche und Möbel-Leiste
+  await max.locator("[data-object]").first().click();
   await max.getByRole("tab", { name: "Möbel" }).click();
-  await placeAt(max, /Kühlschrank/, 4, 4);
-  await placeAt(max, /Herd/, 6, 4);
-  await placeAt(max, /Spüle/, 8, 4);
-  await placeAt(max, /Restmüll/, 9, 7);
-  await placeAt(max, /Biomüll/, 8, 7);
-  await placeAt(max, /Esstisch/, 5, 7);
-  for (const n of ["Kühlschrank", "Herd", "Spüle"])
-    await max
-      .getByRole("checkbox", { name: `${n} für Gruppe auswählen` })
-      .check();
-  await max.getByRole("button", { name: "Gruppieren" }).click();
-  await expect(max.getByText(/Einbauküche \(3 Teile\)/)).toBeVisible();
-
-  await selectRoom(max, "Bad");
-  await max.getByRole("tab", { name: "Möbel" }).click();
-  await placeAt(max, /Toilette/, 10, 4);
-  await placeAt(max, /Dusche/, 12, 4);
-  await placeAt(max, /Waschbecken/, 12, 8);
-
-  await selectRoom(max, "Flur");
-  await max.getByRole("tab", { name: "Möbel" }).click();
-  await placeAt(max, /Schuhregal/, 4, 9);
-
-  await selectRoom(max, "Wohnzimmer");
-  await max.getByRole("tab", { name: "Möbel" }).click();
-  await placeAt(max, /Sofa/, 4, 14);
-  await placeAt(max, /Pflanze/, 9, 11);
-  await max
-    .getByRole("region", { name: "Möbel im Raum" })
-    .getByRole("button", { name: /Sofa/ })
-    .click();
-  await max.getByTestId("plan-editor").scrollIntoViewIfNeeded();
+  await expect(max.getByTestId("object-sheet")).toContainText("Küchenzeile");
+  await max.getByTestId("build-mode").scrollIntoViewIfNeeded();
+  await max.evaluate(() => window.scrollTo(0, 0));
   await shot(max, "09-editor");
 
   // Ein paar Aufgaben „älter“ machen, damit der Plan Farbe bekommt
@@ -251,6 +165,10 @@ test("README-Screenshots", async ({ browser }) => {
   backdate("Restmüll rausbringen", 1.7);
   backdate("Herd reinigen", 0.85);
   backdate("Gießen", 0.6);
+  backdate("Kühlschrank auswischen", 0.05);
+  backdate("Dusche putzen", 0.1);
+  backdate("Biomüll rausbringen", 0.2);
+  backdate("Arbeitsplatte abwischen", 0.3);
 
   await others.Anna.goto("/aufgaben");
   await others.Anna.getByRole("button", {

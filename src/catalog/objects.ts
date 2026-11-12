@@ -351,3 +351,43 @@ export function libraryFor(roomType: RoomType): ObjectDefinition[] {
     o.rooms.length === 0 || o.rooms.includes(roomType);
   return [...OBJECTS.filter(fits), ...OBJECTS.filter((o) => !fits(o))];
 }
+
+/**
+ * Zusammengesetzte Karten im Baumodus: legen mehrere Objekte in einem Zug
+ * und fassen sie zu einer Gruppe zusammen. Jedes Teil bleibt einzeln
+ * antippbar, mit eigenen Aufgaben.
+ */
+export type CompositeDefinition = {
+  type: string;
+  name: string;
+  emoji: string;
+  rooms: RoomType[];
+  /** Teile nebeneinander, dx in Kacheln ab dem linken Rand. */
+  parts: { type: string; dx: number }[];
+};
+
+export const COMPOSITES: CompositeDefinition[] = [
+  {
+    type: "kitchenette",
+    name: "Küchenzeile",
+    emoji: "🍳",
+    rooms: KITCHEN,
+    parts: [
+      { type: "counter", dx: 0 },
+      { type: "stove", dx: 3 },
+      { type: "sink", dx: 5 },
+    ],
+  },
+];
+
+/** Gesamtgröße einer Küchenzeile o. Ä. (ungedreht). */
+export function compositeSize(c: CompositeDefinition) {
+  let w = 0;
+  let h = 0;
+  for (const p of c.parts) {
+    const def = BY_TYPE.get(p.type)!;
+    w = Math.max(w, p.dx + def.w);
+    h = Math.max(h, def.h);
+  }
+  return { w, h };
+}

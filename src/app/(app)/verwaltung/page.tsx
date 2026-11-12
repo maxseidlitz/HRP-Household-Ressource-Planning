@@ -23,18 +23,11 @@ export default async function AdminPage() {
 
   const steps = [
     {
-      href: "/verwaltung/wohnung",
-      icon: "🗺️",
-      title: "Räume & Aufgaben",
-      text: `${rooms.length} Räume · ${tasks.length} Aufgaben`,
-      done: tasks.length > 0,
-    },
-    {
       href: "/plan/bearbeiten",
-      icon: "📐",
-      title: "Grundriss",
-      text: `${rooms.filter((r) => r.tilesJson !== "[]").length} von ${rooms.length} Räumen gezeichnet`,
-      done: rooms.length > 0 && rooms.every((r) => r.tilesJson !== "[]"),
+      icon: "🏗️",
+      title: "Wohnung bauen",
+      text: `${rooms.length} Räume · ${tasks.length} Aufgaben`,
+      done: tasks.length > 0 && rooms.every((r) => r.tilesJson !== "[]"),
     },
     {
       href: "/verwaltung/einladungen",

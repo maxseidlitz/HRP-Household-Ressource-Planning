@@ -96,23 +96,34 @@ Registrierung optional.
 
 ## 4. Wohnungsplan
 
-### 4.1 Raum-Editor
+### 4.1 Baumodus
+
+Die Wohnung entsteht spielerisch wie in einem Aufbauspiel, in einem einzigen
+Bildschirm mit Plan oben und Karten-Leiste unten.
 
 - Raster-basiert (1 Kachel ≈ 50 cm), ein gemeinsames globales Raster.
-- Räume als Rechtecke aufziehen; L-Formen durch Zusammenfügen.
+- **Vorlagen** zum Start (3er-WG, 2er-WG, 1-Zimmer-Apartment) oder leer
+  beginnen.
+- Raumkarte wählen, dann **Rechteck aufziehen** (oder tippen für eine
+  Standardgröße); verschieben per Ziehen, Größe über **Griffe** an den Kanten,
+  **Anbauen** für L-Formen.
 - Raumtypen: Küche, Bad, WC, Flur, Wohnzimmer, Zimmer, Balkon, Abstellraum,
   Sonstiges.
-- Türen auf Wandsegmenten.
-- Gemeinschaftsräume bearbeiten nur Admins.
+- **Türen setzen sich von selbst**, sodass jeder Raum erreichbar ist (bevorzugt
+  über den Flur). Wand antippen setzt oder entfernt eine Tür.
+- Überschneidungen werden sofort angezeigt und verhindert.
+- **Rückgängig/Wiederholen**, automatisches Speichern.
+- Den Grundriss (auch die Umrisse privater Zimmer) baut **nur der Admin**.
+  Wer ein privates Zimmer besitzt, öffnet den Baumodus nur für das eigene
+  Zimmer: Möbel und eigene Unterräume.
 
 ### 4.2 Private Zimmer
 
 - Der Admin zeichnet ein Zimmer im Grundriss und **weist es einem Mitglied zu**.
 - Ab dann richtet **nur die Besitzerin/der Besitzer** das Zimmer ein: Objekte,
   Aufgaben, auch eigene **Unterräume** (z. B. eigene Küche oder eigenes Bad).
-- Die Besitzerin/der Besitzer darf den Umriss **erweitern**, allerdings nur auf
-  Kacheln, die keinem anderen Raum gehören. Der neue Umriss erscheint auch im
-  Gesamtplan.
+- Den Umriss ändert nur der Admin; verschiebt er das Zimmer, wandert der
+  (für ihn unsichtbare) Inhalt mit.
 - **Sichtbarkeit:** Für alle anderen, auch für Admins, ist das Zimmer
   **ausgegraut**; sichtbar ist nur der Umriss mit Namensschild. Die Besitzerin/
   der Besitzer sieht alles. Das wird **serverseitig** durchgesetzt: Objekte,
@@ -128,9 +139,15 @@ Registrierung optional.
 
 ### 4.3 Objekte
 
-- Per Drag & Drop aus einer Bibliothek in Räume, drehbar in 90°-Schritten,
-  mit Grundfläche (Breite × Tiefe in Kacheln).
-- **Objektgruppen:** z. B. **Einbauküche** = Herd + Ofen + Arbeitsplatte + Spüle +
+- Aus der **Möbel-Leiste** antippen (stellt automatisch an einen freien Platz)
+  oder in einen Raum ziehen; drehbar in 90°-Schritten, mit Grundfläche
+  (Breite × Tiefe in Kacheln). Die Leiste zeigt zuerst, was in den gewählten
+  Raum passt.
+- Neue Objekte bringen ihre **Aufgaben automatisch mit** (aus den Vorschlägen);
+  im Objekt-Blatt lassen sie sich abwählen, das Intervall ändern und
+  „Zuletzt gemacht?“ beantworten.
+- **Objektgruppen:** z. B. **Küchenzeile** (Arbeitsplatte + Herd + Spüle) als
+  eine Karte, oder eine **Einbauküche** = Herd + Ofen + Arbeitsplatte + Spüle +
   Geschirrspüler + Mülleimer. Als ein Möbelblock gerendert; jedes Teil behält
   eigene Aufgaben und Färbung.
 - **Boden:** Jeder Raum hat automatisch ein implizites Objekt „Boden“

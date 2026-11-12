@@ -45,9 +45,9 @@ braucht es nicht.
 | :---------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: |
 | <img src="docs/screenshots/00-wohnung.png" width="240" alt="Isometrisches Diorama mit Statusfarben und Avataren"> | <img src="docs/screenshots/12-geputzt.png" width="240" alt="Avatar hat das Klo geputzt, +4,5 Punkte schweben hoch"> | <img src="docs/screenshots/10-objekt.png" width="240" alt="Bottom-Sheet mit den Aufgaben der Toilette"> |
 
-|                                          2D-Plan                                          |                                            Plan bearbeiten                                            |                                            Aufgaben                                             |
-| :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------: |
-| <img src="docs/screenshots/11-plan-2d.png" width="240" alt="Draufsicht mit Statusfarben"> | <img src="docs/screenshots/09-editor.png" width="240" alt="Raum-Editor mit Raster, Türen und Möbeln"> | <img src="docs/screenshots/04-aufgaben.png" width="240" alt="Aufgabenliste nach Dringlichkeit"> |
+|                                          2D-Plan                                          |                                                     Baumodus                                                      |                                            Aufgaben                                             |
+| :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/11-plan-2d.png" width="240" alt="Draufsicht mit Statusfarben"> | <img src="docs/screenshots/09-editor.png" width="240" alt="Baumodus: Küchenzeile ausgewählt, Möbel-Leiste unten"> | <img src="docs/screenshots/04-aufgaben.png" width="240" alt="Aufgabenliste nach Dringlichkeit"> |
 
 |                                    Aufgabe & Historie                                     |                                      Rangliste                                       |                                   Einladen per QR-Code                                    |
 | :---------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
@@ -61,15 +61,15 @@ braucht es nicht.
 | :-------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------: |
 | <img src="docs/screenshots/16-widerspruch.png" width="240" alt="Abstimmung über einen Widerspruch mit Zwischenstand"> | <img src="docs/screenshots/17-statistik.png" width="240" alt="Statistik-Dashboard mit aktiven Personen pro Tag"> | <img src="docs/screenshots/18-feedback.png" width="240" alt="Feedback-Ticket mit Status und Antwort"> |
 
-|                                           Raum einrichten                                            |                              Profil & Avatar                               |                                  WG erstellen                                   |
-| :--------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
-| <img src="docs/screenshots/03-raum.png" width="240" alt="Objekt mit Aufgabenvorschlägen hinzufügen"> | <img src="docs/screenshots/08-profil.png" width="240" alt="Avatar-Editor"> | <img src="docs/screenshots/02-wg-erstellen.png" width="240" alt="WG erstellen"> |
+|                                              Vorlage wählen                                              |                              Profil & Avatar                               |                                  WG erstellen                                   |
+| :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
+| <img src="docs/screenshots/03-vorlage.png" width="240" alt="Baumodus startet mit einer Wohnungsvorlage"> | <img src="docs/screenshots/08-profil.png" width="240" alt="Avatar-Editor"> | <img src="docs/screenshots/02-wg-erstellen.png" width="240" alt="WG erstellen"> |
 
 |                                           Push & App installieren                                            |
 | :----------------------------------------------------------------------------------------------------------: |
 | <img src="docs/screenshots/19-push.png" width="240" alt="Push-Nachrichten einschalten und App installieren"> |
 
-> Stand: Phase 5 im Liquid-Glass-Design. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
+> Stand: Phase 5 mit Baumodus im Liquid-Glass-Design. Die Screenshots werden mit jeder Phase automatisch neu erzeugt
 > (`npm run screenshots`).
 
 ## ✨ Funktionen
@@ -87,6 +87,7 @@ braucht es nicht.
 | 📊  | Admin-Statistiken, Feedback-Tickets mit Screenshot, Einstellungen, JSON-Export, Widerspruch per Abstimmung                                         | ✅ Phase 4  |
 | 🪟  | Modernes Liquid-Glass-Design: Glasflächen, schwebende Tab-Leiste, Linien-Icons                                                                     | ✅          |
 | 🔔  | Eigene Domain mit HTTPS (Caddy), Installation als App (PWA), Push-Benachrichtigungen, Offline-Hinweis                                              | ✅ Phase 5  |
+| 🧱  | Baumodus wie im Aufbauspiel: Vorlagen, Räume aufziehen, Türen von selbst, Möbel aus der Leiste ziehen, Rückgängig, Aufgaben kommen automatisch mit | ✅          |
 
 Details: [Spezifikation](docs/SPEC.md) · [Umsetzungsplan](docs/PLAN.md)
 
